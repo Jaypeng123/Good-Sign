@@ -1,18 +1,82 @@
 // src/data.js
 
+// `symbol` is a monochrome text-presentation glyph (U+FE0E forces non-emoji rendering).
+// `image` points at /public/zodiac/<id>.jpg — stays null until real photo assets are supplied,
+// the icon grid falls back to `symbol` automatically when it's missing or fails to load.
+// `traits` are the four Greek-mythology-flavoured dimensions shown in the insight panel.
 export const ZODIACS = [
-  { id: 'aries', label: '牡羊座', god: '公羊 Aries', element: 'fire', desc: '展現出如古星圖中奮力奔騰的公羊姿態，具備無畏的開創性與純粹的行動意志。' },
-  { id: 'taurus', label: '金牛座', god: '野牛 Taurus', element: 'earth', desc: '如同破雲而出的雄渾野牛，靈魂深處錨定著對物質與美感的極高鑑賞力與沉穩耐性。' },
-  { id: 'gemini', label: '雙子座', god: '雙子 Gemini', element: 'air', desc: '形同星圖中親密依偎的孿生子，思維在兩個維度間自由切換，熱愛流動的智識與資訊。' },
-  { id: 'cancer', label: '巨蟹座', god: '巨蟹 Cancer', element: 'water', desc: '具備寫實甲殼的巨蟹意象，外殼堅固冷靜，內裡卻包裹著如同海洋潮汐般細膩的防衛與直覺。' },
-  { id: 'leo', label: '獅子座', god: '雄獅 Leo', element: 'fire', desc: '步伐昂首的傲慢雄獅，天生需要成為空間中的核心座標，慷慨且極度看重尊嚴。' },
-  { id: 'virgo', label: '處女座', god: '翼之女神 Virgo', element: 'earth', desc: '手持麥穗、展翅佇立的翼之女神，用極致的理性與冷靜，在混亂的凡間梳理出優雅的秩序。' },
-  { id: 'libra', label: '天秤座', god: '正義天秤 Libra', element: 'air', desc: '懸浮於星空中央的黃金天秤，終生在人際、美感與核心法碼之間，尋求最不費力的極致平衡。' },
-  { id: 'scorpio', label: '天蠍座', god: '毒蠍 Scorpius', element: 'water', desc: '帶著神祕引力的潛伏毒蠍，擁有看透言外之意的敏銳洞察力，情感絕對純粹且帶有強烈領域感。' },
-  { id: 'sagittarius', label: '射手座', god: '半人馬射手 Sagittarius', element: 'fire', desc: '挽弓拉滿、蓄勢待發的半人馬戰士，靈魂永遠望向更高遠的哲學星空，嚮往絕對自由。' },
-  { id: 'capricorn', label: '摩羯座', god: '海山羊 Capricornus', element: 'earth', desc: '古老神話中的海山羊，既能在陡峭的山巔攀登，亦能在深邃的海底泅泳，堅韌且耐得住時光洗鍊。' },
-  { id: 'aquarius', label: '水瓶座', god: '持甕侍者 Waseerman', element: 'air', desc: '傾倒神聖泉水的持甕智者，思想前衛叛逆，靈魂獨立於大眾常規之外，只對真理對頻。' },
-  { id: 'pisces', label: '雙魚座', god: '游動雙魚 Pisces', element: 'water', desc: '被命運絲帶相連、朝相反方向游動的雙魚，精神世界無垠開闊，交織著極高的同理心與夢境想像。' },
+  { id: 'aries', label: '牡羊座', god: '公羊 Aries', element: 'fire', desc: '展現出如古星圖中奮力奔騰的公羊姿態，具備無畏的開創性與純粹的行動意志。', symbol: '♈︎', image: null, traits: {
+    aphrodite: '戀愛時衝很快，一句「在幹嘛」都能腦補成告白現場，黏人期通常只維持三天，新鮮感一過就開始找下一個目標。',
+    athena: '工作上見不得別人比自己快，交辦出去的事情永遠自己搶著做，控制狂指數爆表但美其名叫「效率」。',
+    hestia: '對家人朋友嘴很硬但事情做很多，永遠是那個嘴巴說不要、身體卻已經在處理的人。',
+    core: '死穴是輸的感覺，輸了什麼都可以，就是輸了面子不行，傲嬌到會為了嘴硬而硬拗到底。',
+  } },
+  { id: 'taurus', label: '金牛座', god: '野牛 Taurus', element: 'earth', desc: '如同破雲而出的雄渾野牛，靈魂深處錨定著對物質與美感的極高鑑賞力與沉穩耐性。', symbol: '♉︎', image: null, traits: {
+    aphrodite: '黏人度看心情，但一旦認定你就會用食物和禮物瘋狂表達愛意，隱藏訊號是幫你記住所有小細節。',
+    athena: '職場控制狂等級中等，但對於自己負責的區塊寸土不讓，改一個字都要問三次為什麼。',
+    hestia: '私底下其實很依賴熟悉的人事物，換一間常去的店都會不開心，家人面前完全放飛自我。',
+    core: '死穴是被逼著改變步調，慢工出細活是信仰，越催他越故意放慢，傲嬌到懶得解釋。',
+  } },
+  { id: 'gemini', label: '雙子座', god: '雙子 Gemini', element: 'air', desc: '形同星圖中親密依偎的孿生子，思維在兩個維度間自由切換，熱愛流動的智識與資訊。', symbol: '♊︎', image: null, traits: {
+    aphrodite: '戀愛時話術一流，黏人度忽高忽低全看新鮮感，隱藏訊號是突然開始密集傳迷因給你。',
+    athena: '職場上點子超多但執行力看心情，控制狂指數低，比較像放養型主管或同事。',
+    hestia: '對家人朋友是兩種人格，熟人面前話多到停不下來，陌生場合秒變安靜臉。',
+    core: '死穴是被說膚淺或善變，明明博學卻最怕被貼標籤，傲嬌起來會瘋狂科普證明自己。',
+  } },
+  { id: 'cancer', label: '巨蟹座', god: '巨蟹 Cancer', element: 'water', desc: '具備寫實甲殼的巨蟹意象，外殼堅固冷靜，內裡卻包裹著如同海洋潮汐般細膩的防衛與直覺。', symbol: '♋︎', image: null, traits: {
+    aphrodite: '黏人度天花板等級，戀愛腦一發動就會想把對方納入生活的每個細節，隱藏訊號是默默幫你囤食物。',
+    athena: '職場控制狂指數中高，特別在意團隊氣氛，容易把同事的情緒也扛在自己身上。',
+    hestia: '對家人朋友是真的用生命在對待，記得每個人的生日和喜好，護短程度驚人。',
+    core: '死穴是被說不被需要，表面說沒關係其實會偷偷難過很久，傲嬌到會用鬧脾氣代替直說。',
+  } },
+  { id: 'leo', label: '獅子座', god: '雄獅 Leo', element: 'fire', desc: '步伐昂首的傲慢雄獅，天生需要成為空間中的核心座標，慷慨且極度看重尊嚴。', symbol: '♌︎', image: null, traits: {
+    aphrodite: '黏人度看場合，公開場合超大方放閃，私下反而需要被哄，隱藏訊號是特別愛在你面前耍帥。',
+    athena: '職場控制狂指數頂級，天生想當主角，交辦出去的事情還是會忍不住盯場。',
+    hestia: '對熟人超級講義氣，請客從不手軟，但也偷偷希望大家記得他的好。',
+    core: '死穴是被忽視，比起被討厭更怕沒有存在感，傲嬌到寧願裝沒事也不會主動求關注。',
+  } },
+  { id: 'virgo', label: '處女座', god: '翼之女神 Virgo', element: 'earth', desc: '手持麥穗、展翅佇立的翼之女神，用極致的理性與冷靜，在混亂的凡間梳理出優雅的秩序。', symbol: '♍︎', image: null, traits: {
+    aphrodite: '黏人度低調但很勤勞，戀愛時會用「幫你解決問題」代替說甜話，隱藏訊號是開始糾正你的生活習慣。',
+    athena: '職場控制狂本尊，細節魔人，別人的作業不改到滿意會渾身不對勁。',
+    hestia: '對家人朋友嘴巴挑剔但行動誠實，會默默把你該做的事情都做完再念你一頓。',
+    core: '死穴是被說不夠好，明明已經很努力還是覺得可以更完美，傲嬌到永遠先自我批評。',
+  } },
+  { id: 'libra', label: '天秤座', god: '正義天秤 Libra', element: 'air', desc: '懸浮於星空中央的黃金天秤，終生在人際、美感與核心法碼之間，尋求最不費力的極致平衡。', symbol: '♎︎', image: null, traits: {
+    aphrodite: '黏人度中等但很會製造浪漫氛圍，戀愛時特別在意公平，隱藏訊號是開始認真配合你的喜好。',
+    athena: '職場控制狂指數偏低，很怕當壞人，但決策拖延症容易讓人抓狂。',
+    hestia: '對熟人來說是超級好相處的和事佬，私下其實很難真正表態自己想要什麼。',
+    core: '死穴是被說偏心或不公平，最怕選邊站，傲嬌到寧願自己委屈也要維持表面和諧。',
+  } },
+  { id: 'scorpio', label: '天蠍座', god: '毒蠍 Scorpius', element: 'water', desc: '帶著神祕引力的潛伏毒蠍，擁有看透言外之意的敏銳洞察力，情感絕對純粹且帶有強烈領域感。', symbol: '♏︎', image: null, traits: {
+    aphrodite: '黏人度隱藏在細節裡，表面高冷私下超級占有慾，隱藏訊號是開始默默關注你在忙什麼。',
+    athena: '職場控制狂等級極高，喜歡掌握全局資訊，不喜歡被蒙在鼓裡的感覺。',
+    hestia: '對真正的自己人赴湯蹈火，但要先通過他漫長的觀察期才算數。',
+    core: '死穴是被背叛或被看穿心事，明明很敏感卻硬要裝作雲淡風輕，傲嬌到用冷漠掩飾在意。',
+  } },
+  { id: 'sagittarius', label: '射手座', god: '半人馬射手 Sagittarius', element: 'fire', desc: '挽弓拉滿、蓄勢待發的半人馬戰士，靈魂永遠望向更高遠的哲學星空，嚮往絕對自由。', symbol: '♐︎', image: null, traits: {
+    aphrodite: '黏人度看自由度夠不夠，戀愛時最怕被綁住，隱藏訊號是開始規劃兩人的下一趟旅行。',
+    athena: '職場控制狂指數低，比較在意方向對不對，細節通常交給別人煩惱。',
+    hestia: '對朋友家人很夠意思但常常人在心不在，忘記約定是家常便飯。',
+    core: '死穴是被限制自由，一旦感覺被綁住就會想逃，傲嬌到用「開玩笑」包裝真心話。',
+  } },
+  { id: 'capricorn', label: '摩羯座', god: '海山羊 Capricornus', element: 'earth', desc: '古老神話中的海山羊，既能在陡峭的山巔攀登，亦能在深邃的海底泅泳，堅韌且耐得住時光洗鍊。', symbol: '♑︎', image: null, traits: {
+    aphrodite: '黏人度低但很實際，戀愛像簽長期合約，隱藏訊號是開始跟你討論未來規劃。',
+    athena: '職場控制狂天花板，事必躬親、目標感超強，看不慣沒效率的流程。',
+    hestia: '對家人責任感重到有點沉重，習慣把情緒收起來自己扛。',
+    core: '死穴是被說沒有成就或不夠努力，明明很拼還是覺得不夠，傲嬌到用工作逃避情緒。',
+  } },
+  { id: 'aquarius', label: '水瓶座', god: '持甕侍者 Waseerman', element: 'air', desc: '傾倒神聖泉水的持甕智者，思想前衛叛逆，靈魂獨立於大眾常規之外，只對真理對頻。', symbol: '♒︎', image: null, traits: {
+    aphrodite: '黏人度看心情且很跳躍，戀愛時把你當最好的朋友，隱藏訊號是開始想跟你討論奇怪的理論。',
+    athena: '職場控制狂指數低，喜歡打破常規，規則對他來說是拿來挑戰的。',
+    hestia: '對熟人很講義氣但情感表達很間接，關心的方式常常讓人抓不到重點。',
+    core: '死穴是被說跟大家一樣，最怕失去獨特性，傲嬌到會刻意特立獨行證明自己。',
+  } },
+  { id: 'pisces', label: '雙魚座', god: '游動雙魚 Pisces', element: 'water', desc: '被命運絲帶相連、朝相反方向游動的雙魚，精神世界無垠開闊，交織著極高的同理心與夢境想像。', symbol: '♓︎', image: null, traits: {
+    aphrodite: '黏人度爆表且戀愛腦嚴重，很容易把曖昧腦補成偶像劇，隱藏訊號是開始幫你寫小劇本式的訊息。',
+    athena: '職場控制狂指數低，容易心軟被拗，但創意和同理心是強項。',
+    hestia: '對家人朋友情感豐沛到有點戲劇化，別人的情緒他都會不小心一起扛。',
+    core: '死穴是被說太敏感或想太多，明明受傷了還是會先體諒別人，傲嬌到用沉默代替訴苦。',
+  } },
 ]
 
 export const MBTIS = [

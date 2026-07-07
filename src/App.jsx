@@ -11,43 +11,116 @@ import {
   generateComprehensiveAnalysis,
 } from './data'
 
-// 十七世紀銅雕星圖風格的內聯高精度向量 SVG 組件
-function VintageZodiacIcon({ id, active }) {
-  const getDeityPath = (zId) => {
-    switch (zId) {
-      case 'aries': return "M25,55 Q35,35 55,38 Q65,40 75,32 Q82,25 78,42 Q74,55 60,60 Q45,62 30,70";
-      case 'taurus': return "M75,55 Q60,40 45,45 Q35,48 25,35 Q18,25 32,28 Q42,32 55,25 Q68,18 70,38";
-      case 'gemini': return "M38,30 C38,20 48,20 48,30 M58,35 C58,25 68,25 68,35";
-      case 'cancer': return "M30,50 Q20,32 35,25 Q50,18 65,25 Q80,32 70,50 Q60,65 50,65 Q40,65 30,50 Z";
-      case 'leo': return "M20,65 Q35,55 45,58 Q60,60 70,42 Q78,25 65,18 Q52,12 40,30 Q30,42 20,45";
-      case 'virgo': return "M50,22 C50,15 42,15 42,22 C42,28 50,32 50,42 L46,82 M54,42 L58,82";
-      case 'libra': return "M50,15 L50,75 M15,30 L85,30 M50,30 L50,25";
-      case 'scorpio': return "M50,15 L50,60 Q50,78 30,75 Q15,72 25,62 L38,65";
-      case 'sagittarius': return "M30,70 L70,30 M60,30 L70,30 L70,40";
-      case 'capricorn': return "M25,38 Q38,48 50,45 Q68,42 78,55 Q85,68 68,75 Q52,80 42,65 Q35,52 50,55";
-      case 'aquarius': return "M42,30 L58,30 M40,40 L60,40 M35,55 C35,70 65,70 65,55 L60,40 L40,40 Z";
-      case 'pisces': return "M15,35 C35,22 45,45 22,48 Z";
-      default: return "";
-    }
-  };
+const SIGN_BLUE = '#1D4ED8'
 
-  // 💡 核心修改 1：設定正確的 Royal Blue 外框顏色
-  // 將原本設定為 deep ink 的部分元件顏色恢復為 Royal Blue
-  // const strokeColor = active ? '#F6F3ED' : '#2C2A29'; // 💡 移除原本的墨色外框
-  const strokeColor = active ? '#F6F3ED' : '#1D4ED8'; // 💡 更新：預設為 Royal Blue 外框
+// Real deity photography slots in via `z.image` (see data.js) — until those assets are
+// supplied this renders the monochrome zodiac glyph instead, so the grid never looks broken.
+function VintageZodiacIcon({ z, active }) {
+  const [imgFailed, setImgFailed] = useState(false)
+  const showImage = z.image && !imgFailed
+
+  if (showImage) {
+    return (
+      <img
+        src={z.image}
+        alt={z.label}
+        onError={() => setImgFailed(true)}
+        className="w-16 h-16 object-cover rounded-full shadow-[inset_2px_2px_4px_rgba(255,255,255,0.6),inset_-2px_-2px_6px_rgba(29,78,216,0.2)]"
+      />
+    )
+  }
 
   return (
-    <svg viewBox="0 0 100 100" className="w-16 h-16 transition-all duration-700">
-      <path
-        d={getDeityPath(id)}
-        stroke={strokeColor}
-        strokeWidth="1.2"
-        strokeLinecap="round"
-        fill="none"
-      />
-      {/* 💡 所有星座圖標外框也變成藍色 */}
-    </svg>
-  );
+    <span
+      className="block w-16 h-16 leading-[4rem] text-center font-serif text-4xl transition-all duration-700"
+      style={{ color: active ? '#F6F3ED' : SIGN_BLUE }}
+    >
+      {z.symbol}
+    </span>
+  )
+}
+
+function StarField() {
+  return (
+    <div
+      className="pointer-events-none absolute inset-0 opacity-40"
+      style={{
+        backgroundImage: `radial-gradient(circle, rgba(29,78,216,0.3) 1px, transparent 1px)`,
+        backgroundSize: '32px 32px',
+      }}
+    />
+  )
+}
+
+function CornerMarks() {
+  return (
+    <>
+      <span className="absolute -top-1.5 -left-1.5 text-[#1D4ED8]/50 text-sm leading-none select-none">+</span>
+      <span className="absolute -top-1.5 -right-1.5 text-[#1D4ED8]/50 text-sm leading-none select-none">+</span>
+      <span className="absolute -bottom-1.5 -left-1.5 text-[#1D4ED8]/50 text-sm leading-none select-none">+</span>
+      <span className="absolute -bottom-1.5 -right-1.5 text-[#1D4ED8]/50 text-sm leading-none select-none">+</span>
+    </>
+  )
+}
+
+function DividerOrnament() {
+  return (
+    <span className="absolute left-1/2 -translate-x-1/2 -bottom-[3px] w-2 h-2 rotate-45 bg-cream border border-[#1D4ED8]/40" />
+  )
+}
+
+function Dropdown({ label, value, onChange, options, placeholder }) {
+  const [open, setOpen] = useState(false)
+  const rootRef = useRef(null)
+
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
+
+  return (
+    <div ref={rootRef} className="relative max-w-xs">
+      {label && <span className="text-[10px] uppercase tracking-[0.2em] text-[#1D4ED8]/40 font-mono block mb-2">{label}</span>}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center justify-between border border-[#1D4ED8]/25 bg-cream px-4 py-2.5 text-base text-[#1D4ED8] font-mono tracking-wider hover:border-[#1D4ED8]/60 transition-colors duration-300"
+      >
+        <span className={value ? '' : 'text-[#1D4ED8]/40'}>{value || placeholder}</span>
+        <span className={`text-xs transition-transform duration-300 ${open ? 'rotate-180' : ''}`}>▾</span>
+      </button>
+      <div
+        className={`absolute z-20 mt-1 w-full max-h-64 overflow-y-auto bg-cream border border-[#1D4ED8]/30 shadow-[0_16px_32px_rgba(29,78,216,0.18)] transition-all duration-200 origin-top ${
+          open ? 'opacity-100 scale-y-100 pointer-events-auto' : 'opacity-0 scale-y-95 pointer-events-none'
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => { onChange(''); setOpen(false) }}
+          className={`w-full text-left px-4 py-2 text-sm font-mono transition-colors duration-150 hover:bg-[#1D4ED8]/10 ${
+            !value ? 'text-[#1D4ED8]/40' : 'text-[#1D4ED8]'
+          }`}
+        >
+          {placeholder}
+        </button>
+        {options.map((o) => (
+          <button
+            key={o}
+            type="button"
+            onClick={() => { onChange(o); setOpen(false) }}
+            className={`w-full text-left px-4 py-2 text-sm font-mono transition-colors duration-150 hover:bg-[#1D4ED8]/10 ${
+              value === o ? 'bg-[#1D4ED8]/10 font-semibold text-[#1D4ED8]' : 'text-[#1D4ED8]/80'
+            }`}
+          >
+            {o}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
 }
 
 export default function App() {
@@ -65,17 +138,6 @@ export default function App() {
 
   const [currentView, setCurrentView] = useState('input')
   const [analysisResult, setAnalysisResult] = useState(null)
-
-  const [mouseCoord, setMouseCoord] = useState({ x: '50%', y: '50%' })
-  const [isTitleHovered, setIsTitleHovered] = useState(false)
-  const topTitleRef = useRef(null)
-
-  const handleTitleMouseMove = (e) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 100 + '%';
-    const y = ((e.clientY - rect.top) / rect.height) * 100 + '%';
-    setMouseCoord({ x, y });
-  };
 
   const isIdentityProvided = targetZodiac || targetMbti;
   const isContextProvided = purpose && environment && energy;
@@ -111,44 +173,34 @@ export default function App() {
   const selectedZodiacData = ZODIACS.find(z => z.id === targetZodiac)
 
   return (
-    <div className="min-h-screen bg-cream text-ink antialiased font-sans selection:bg-ink selection:text-cream">
+    <div className="relative min-h-screen bg-cream text-ink antialiased font-sans selection:bg-ink selection:text-cream overflow-x-hidden">
+      <StarField />
       {/* 頂部高級網格版頭 */}
-      <header className="max-w-6xl mx-auto px-6 pt-16 md:pt-24 pb-12 border-b border-sand/60">
+      <header className="relative max-w-6xl mx-auto px-6 pt-16 md:pt-24 pb-12 border-b border-sand/60">
         <div className="flex items-center justify-between text-[11px] tracking-[0.25em] uppercase text-ink/40 font-mono mb-8">
           <span>A.26 — CELESTIAL ALIGNMENT</span>
           <span>FIELD EMISSION — VERSION 2.0</span>
         </div>
-        
-        {/* 滑鼠游標局部跟隨的「銀色雕刻探照燈」效果 */}
-        <div 
-          onMouseMove={handleTitleMouseMove}
-          onMouseEnter={() => setIsTitleHovered(true)}
-          onMouseLeave={() => setIsTitleHovered(false)}
-          className="relative w-full block my-12 select-none cursor-crosshair text-center"
-        >
-          {/* 💡 核心修改 2：將巨大標題文字顏色恢復為 Royal Blue */}
-          {/* 雖然設定了 ID，但這裡的行內樣式也會覆蓋 CSS。請確保 CSS ID 設定正確 */}
-          <h1 id="good-sign-title" className="font-serif text-6xl sm:text-8xl md:text-[11rem] lg:text-[13rem] font-bold text-ink uppercase leading-none m-0">
-            GOOD SIGN
-          </h1>
-          
-          <h1 
-            ref={topTitleRef}
-            className="absolute inset-0 font-serif text-6xl sm:text-8xl md:text-[11rem] lg:text-[13rem] font-bold uppercase leading-none m-0 pointer-events-none transition-opacity duration-300"
-            style={{
-              color: 'transparent',
-              backgroundImage: 'linear-gradient(135deg, #4b5563 0%, #d1d5db 25%, #ffffff 50%, #d1d5db 75%, #4b5563 100%)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              opacity: isTitleHovered ? 1 : 0,
-              WebkitMaskImage: `radial-gradient(circle 180px at ${mouseCoord.x} ${mouseCoord.y}, black 0%, rgba(0,0,0,0.4) 60%, transparent 100%)`,
-              maskImage: `radial-gradient(circle 180px at ${mouseCoord.x} ${mouseCoord.y}, black 0%, rgba(0,0,0,0.4) 60%, transparent 100%)`
-            }}
+
+        <div className="flex flex-col items-center text-center select-none my-8">
+          <span className="text-[#1D4ED8]/50 text-lg mb-3">✦</span>
+          <div className="flex items-center gap-4 w-full max-w-xs mb-6">
+            <span className="h-px flex-1 bg-[#1D4ED8]/30" />
+            <span className="w-1.5 h-1.5 rotate-45 bg-[#1D4ED8]/50" />
+            <span className="h-px flex-1 bg-[#1D4ED8]/30" />
+          </div>
+          <h1
+            className="font-['Cinzel'] font-black text-5xl sm:text-7xl md:text-9xl tracking-[0.05em] leading-none text-[#1D4ED8] [transform:scaleY(1.18)] [transform-origin:bottom] drop-shadow-[0_2px_0_rgba(29,78,216,0.15)]"
           >
-            GOOD SIGN
+            GOOD SIGN.
           </h1>
+          <div className="flex items-center gap-4 w-full max-w-xs mt-7">
+            <span className="h-px flex-1 bg-[#1D4ED8]/30" />
+            <span className="w-1.5 h-1.5 rotate-45 bg-[#1D4ED8]/50" />
+            <span className="h-px flex-1 bg-[#1D4ED8]/30" />
+          </div>
         </div>
-        
+
         <p className="text-xs md:text-sm text-ink/60 max-w-3xl mx-auto leading-relaxed text-center pt-6 border-t border-sand/40">
           傾聽古典黃道天體與當代人格科學的交織回響。
           我們摒棄冗餘的自身數據，專注於剖析目標對象隱匿於聊天對話框與物理環境背後的真實波長，
@@ -160,7 +212,8 @@ export default function App() {
       {currentView === 'input' && (
         <main className="max-w-6xl mx-auto px-6 pb-36 animate-fadeIn">
           {/* 區塊 I：神話星座古星圖寫實線條 */}
-          <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <section className="relative py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <DividerOrnament />
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">I.</span>
               <h2 className="font-serif text-xl md:text-2xl mt-1 tracking-wide text-ink">目標神話星象</h2>
@@ -176,18 +229,20 @@ export default function App() {
                       key={z.id}
                       type="button"
                       onClick={() => setTargetZodiac(isSelected ? '' : z.id)}
-                      className={`group relative flex flex-col items-center p-6 border transition-all duration-500 ease-out overflow-hidden ${
+                      className={`group relative flex flex-col items-center p-6 border rounded-2xl transition-all duration-500 ease-out overflow-hidden ${
                         isSelected
-                          ? 'bg-ink text-cream border-ink shadow-[0_16px_32px_-12px_rgba(44,42,41,0.35)]'
-                          : 'bg-transparent text-ink border-sand hover:border-ink/60'
+                          ? 'bg-[#1D4ED8] text-cream border-[#1D4ED8] -translate-y-1 shadow-[0_16px_32px_-12px_rgba(29,78,216,0.45)]'
+                          : 'bg-cream text-ink border-[#1D4ED8]/20 hover:-translate-y-1 hover:border-[#1D4ED8] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.7),inset_-3px_-3px_8px_rgba(29,78,216,0.1)]'
                       }`}
                     >
                       <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/20 to-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none mix-blend-overlay" />
-                      
+                      {/* metallic shimmer sweep */}
+                      <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/30 to-transparent" />
+
                       <div className="mb-2 transition-transform duration-700 group-hover:scale-110">
-                        <VintageZodiacIcon id={z.id} active={isSelected} />
+                        <VintageZodiacIcon z={z} active={isSelected} />
                       </div>
-                      
+
                       <span className="font-serif text-base tracking-wide mt-2">{z.label}</span>
                       <span className={`text-[9px] uppercase tracking-widest font-mono mt-1 ${isSelected ? 'text-cream/40' : 'text-ink/40'}`}>
                         {z.god.split(' ')[0]}
@@ -199,7 +254,8 @@ export default function App() {
 
               {/* 側寫展開面板 */}
               {selectedZodiacData && (
-                <div className="mt-6 p-6 border border-sand bg-ink/[0.005] animate-fadeIn">
+                <div className="relative mt-6 p-6 border border-sand bg-ink/[0.005] animate-fadeIn">
+                  <CornerMarks />
                   <div className="flex items-baseline justify-between border-b border-sand/60 pb-3 mb-4">
                     <h3 className="font-serif text-lg text-ink font-medium">
                       {selectedZodiacData.label} · 守護天體側寫
@@ -209,19 +265,19 @@ export default function App() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-xs md:text-sm leading-relaxed text-ink/70">
                     <div>
                       <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">愛慾與浪漫 Aphrodite's Touch</span>
-                      <p>追求純粹與對等。極度看重交流中的回饋頻率，一旦察覺失衡便會優雅收回情感。</p>
+                      <p>{selectedZodiacData.traits?.aphrodite}</p>
                     </div>
                     <div>
                       <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">神殿事業/修煉 Athena's Shield</span>
-                      <p>具備克制的防禦機制，在緊要關頭傾向用冷靜且客觀的思維重新校準方向。</p>
+                      <p>{selectedZodiacData.traits?.athena}</p>
                     </div>
                     <div>
                       <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">凡間社交/家庭 Hestia's Hearth</span>
-                      <p>私底下對待認可的親密圈子帶有溫柔的反差，往往用隱忍來維持群體的和諧。</p>
+                      <p>{selectedZodiacData.traits?.hestia}</p>
                     </div>
                     <div>
                       <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">靈魂核心 Core Ego</span>
-                      <p className="text-ink/90 font-medium">最無法忍受粗暴的邊界跨越或偏見，寧可保持缄默也絕不向無效對話妥協。</p>
+                      <p className="text-ink/90 font-medium">{selectedZodiacData.traits?.core}</p>
                     </div>
                   </div>
                 </div>
@@ -230,31 +286,26 @@ export default function App() {
           </section>
 
           {/* 區塊 II：MBTI 獨立大項 */}
-          <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <section className="relative py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <DividerOrnament />
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">II.</span>
               <h2 className="font-serif text-xl md:text-2xl mt-1 tracking-wide text-ink">人格矩陣代碼</h2>
               <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 mt-1 font-mono">MBTI Core Type (Optional)</p>
             </div>
             <div className="lg:col-span-9">
-              <div className="relative border-b border-sand focus-within:border-ink max-w-xs transition-colors">
-                <select
-                  value={targetMbti}
-                  onChange={(e) => setTargetMbti(e.target.value)}
-                  className="w-full appearance-none bg-transparent py-2 text-base text-ink outline-none cursor-pointer font-mono tracking-wider"
-                >
-                  <option value="">保留未知（純天體星象推演）</option>
-                  {MBTIS.map((m) => (
-                    <option key={m} value={m}>{m}</option>
-                  ))}
-                </select>
-                <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-ink/40 text-xs">▾</span>
-              </div>
+              <Dropdown
+                value={targetMbti}
+                onChange={setTargetMbti}
+                options={MBTIS}
+                placeholder="保留未知（純天體星象推演）"
+              />
             </div>
           </section>
 
           {/* 區塊 III：場景控制項 */}
-          <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <section className="relative py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <DividerOrnament />
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">III.</span>
               <h2 className="font-serif text-xl md:text-2xl mt-1 tracking-wide text-ink">場景脈絡校準</h2>
@@ -318,7 +369,8 @@ export default function App() {
           </section>
 
           {/* 區塊 IV：截圖上傳 */}
-          <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <section className="relative py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <DividerOrnament />
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">IV.</span>
               <h2 className="font-serif text-xl md:text-2xl mt-1 tracking-wide text-ink">對話波形診斷</h2>
@@ -392,6 +444,7 @@ export default function App() {
           </button>
 
           <div className="border border-sand p-8 md:p-12 bg-ink/[0.005] relative">
+            <CornerMarks />
             <div className="absolute top-0 right-0 w-24 h-24 border-b border-l border-sand/30 opacity-25 pointer-events-none" />
             
             <div className="flex flex-col sm:flex-row sm:items-baseline justify-between border-b border-sand/60 pb-6 mb-8 gap-4">
@@ -456,7 +509,7 @@ export default function App() {
             {/* 💡 所有標籤與描述也應該變成藍色 */}
             <div>
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3 zodiac-desc">❌ 絕對禁忌地獄雷區 No-Go Zone</h3>
-              <p className="text-xs md:text-sm text-red-red leading-relaxed font-sans zodiac-desc">
+              <p className="text-xs md:text-sm text-red-600 leading-relaxed font-sans zodiac-desc">
                 {analysisResult.forbidden}
               </p>
             </div>
