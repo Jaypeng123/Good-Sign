@@ -1,18 +1,18 @@
 // src/data.js
 
 export const ZODIACS = [
-  { id: 'aries', label: '牡羊座', god: '阿瑞斯 Ares', trait: '戰神意象', element: 'fire', desc: '充滿開創性與無畏的行動力，內心藏著不願妥協的英雄主義。' },
-  { id: 'taurus', label: '金牛座', god: '狄蜜特 Demeter', trait: '豐收女神', element: 'earth', desc: '追求感官的極致和諧與穩定，擁有極高的審美眼光與務實靈魂。' },
-  { id: 'gemini', label: '雙子座', god: '荷米斯 Hermes', trait: '神使傳情', element: 'air', desc: '思維如風般敏捷流轉，熱愛探索未知的資訊，靈魂永遠保持好奇。' },
-  { id: 'cancer', label: '巨蟹座', god: '塞勒涅 Selene', trait: '月亮女神', element: 'water', desc: '情感細膩且具備強大的直覺包容力，內心深處極度重視安全感。' },
-  { id: 'leo', label: '獅子座', god: '阿波羅 Apollo', trait: '光明之神', element: 'fire', desc: '天生自帶舞台焦點的光芒，慷慨熱情，同時極度捍衛尊嚴與榮譽。' },
-  { id: 'virgo', label: '處女座', god: '阿斯特莉亞 Astraea', trait: '正義女神', element: 'earth', desc: '追求純粹與極致的秩序，用冷靜客觀的雙眼梳理混亂的凡間事物。' },
-  { id: 'libra', label: '天秤座', god: '阿芙蘿黛蒂 Aphrodite', trait: '美與愛神', element: 'air', desc: '終生在尋求美感、人際與內心法碼的極致平衡，溫和而優雅。' },
-  { id: 'scorpio', label: '天蠍座', god: '黑帝斯 Hades', trait: '冥王意志', element: 'water', desc: '具備看透人性的敏銳洞察力，情感濃烈且絕對忠誠，帶有神祕引力。' },
-  { id: 'sagittarius', label: '射手座', god: '宙斯 Zeus', trait: '眾神之王', element: 'fire', desc: '嚮往思想與肉體的絕對自由，熱愛哲學思考，視人生為一場冒險。' },
-  { id: 'capricorn', label: '摩羯座', god: '克洛諾斯 Cronus', trait: '時間之神', element: 'earth', desc: '沈穩、堅韌且耐得住孤寂，用無比的恆心在時間的洪流中築起城堡。' },
-  { id: 'aquarius', label: '水瓶座', god: '烏拉諾斯 Uranus', trait: '天空之神', element: 'air', desc: '跳脫傳統框架的先驅者，思想前衛自由，靈魂不屬於任何單一集體。' },
-  { id: 'pisces', label: '雙魚座', god: '波賽頓 Poseidon', trait: '海神波瀾', element: 'water', desc: '靈魂深處交織著無垠的想像力與同理心，情感如同海洋般包容萬物。' },
+  { id: 'aries', label: '牡羊座', god: '公羊 Aries', element: 'fire', desc: '展現出如古星圖中奮力奔騰的公羊姿態，具備無畏的開創性與純粹的行動意志。' },
+  { id: 'taurus', label: '金牛座', god: '野牛 Taurus', element: 'earth', desc: '如同破雲而出的雄渾野牛，靈魂深處錨定著對物質與美感的極高鑑賞力與沉穩耐性。' },
+  { id: 'gemini', label: '雙子座', god: '雙子 Gemini', element: 'air', desc: '形同星圖中親密依偎的孿生子，思維在兩個維度間自由切換，熱愛流動的智識與資訊。' },
+  { id: 'cancer', label: '巨蟹座', god: '巨蟹 Cancer', element: 'water', desc: '具備寫實甲殼的巨蟹意象，外殼堅固冷靜，內裡卻包裹著如同海洋潮汐般細膩的防衛與直覺。' },
+  { id: 'leo', label: '獅子座', god: '雄獅 Leo', element: 'fire', desc: '步伐昂首的傲慢雄獅，天生需要成為空間中的核心座標，慷慨且極度看重尊嚴。' },
+  { id: 'virgo', label: '處女座', god: '翼之女神 Virgo', element: 'earth', desc: '手持麥穗、展翅佇立的翼之女神，用極致的理性與冷靜，在混亂的凡間梳理出優雅的秩序。' },
+  { id: 'libra', label: '天秤座', god: '正義天秤 Libra', element: 'air', desc: '懸浮於星空中央的黃金天秤，終生在人際、美感與核心法碼之間，尋求最不費力的極致平衡。' },
+  { id: 'scorpio', label: '天蠍座', god: '毒蠍 Scorpius', element: 'water', desc: '帶著神祕引力的潛伏毒蠍，擁有看透言外之意的敏銳洞察力，情感絕對純粹且帶有強烈領域感。' },
+  { id: 'sagittarius', label: '射手座', god: '半人馬射手 Sagittarius', element: 'fire', desc: '挽弓拉滿、蓄勢待發的半人馬戰士，靈魂永遠望向更高遠的哲學星空，嚮往絕對自由。' },
+  { id: 'capricorn', label: '摩羯座', god: '海山羊 Capricornus', element: 'earth', desc: '古老神話中的海山羊，既能在陡峭的山巔攀登，亦能在深邃的海底泅泳，堅韌且耐得住時光洗鍊。' },
+  { id: 'aquarius', label: '水瓶座', god: '持甕侍者 Waseerman', element: 'air', desc: '傾倒神聖泉水的持甕智者，思想前衛叛逆，靈魂獨立於大眾常規之外，只對真理對頻。' },
+  { id: 'pisces', label: '雙魚座', god: '游動雙魚 Pisces', element: 'water', desc: '被命運絲帶相連、朝相反方向游動的雙魚，精神世界無垠開闊，交織著極高的同理心與夢境想像。' },
 ]
 
 export const MBTIS = [
@@ -24,97 +24,106 @@ export const PURPOSES = [
   { id: 'romantic', label: '浪漫約會', hint: '微醺、曖昧' },
   { id: 'work', label: '職場 Networking', hint: '專業、得體' },
   { id: 'friend', label: '純網友面基', hint: '同好交流' },
-  { id: 'forced', label: '被迫營業', hint: '長輩介紹、尷尬社交' },
+  { id: 'forced', label: '被迫營業', hint: '尷尬社交' },
 ]
 
 export const ENVIRONMENTS = [
   { id: 'quiet_cafe', label: '安靜獨立咖啡廳' },
   { id: 'loud_restaurant', label: '吵鬧熱炒 / 火鍋店' },
   { id: 'outdoor', label: '戶外市集 / 展覽' },
-]
-
+ ]
+ 
 export const ENERGIES = [
   { id: 'high', label: '高能量', hint: '嗨咖模式' },
   { id: 'low', label: '低能量', hint: '靜謐沉穩' },
 ]
 
-// 根據使用者填答動態生成平易近人、具備 ChatGPT 風格的深度分析
 export function generateComprehensiveAnalysis({ zodiac, mbti, purpose, environment, energy, screenshotScores }) {
   const zInfo = ZODIACS.find(z => z.id === zodiac);
-  const targetName = zInfo ? `${zInfo.label} (${zInfo.god.split(' ')[0]})` : (mbti || '神祕對象');
+  const targetPersona = zInfo ? `${zInfo.label} (${zInfo.god})` : (mbti || '神祕觀測對象');
   
-  // 1. 宏觀大方向分析 (Macro Assessment)
-  let macroAssessment = '';
+  // 計算假想的生存機率，借鑑 Moor AI 增加好勝心
+  let survivalRate = 72;
+  if (environment === 'loud_restaurant' && energy === 'low') survivalRate = 42;
+  if (environment === 'quiet_cafe' && mbti?.includes('I')) survivalRate = 89;
+  if (screenshotScores) {
+    survivalRate = Math.max(12, Math.min(96, survivalRate - Math.floor(screenshotScores.freezeRate / 3)));
+  }
+
+  // 1. 宏觀大方向分析 (ChatGPT 諮商風)
+  let macroAssessment = `走進當前的情境，我們會發現 ${targetPersona} 的核心氣場呈現出一種非常細膩的流動。`;
   if (zInfo) {
-    macroAssessment += `對方的靈魂核心與古希臘神話中的「${zInfo.god}」深刻共鳴。在日常互動中，他們展現出${zInfo.desc}`;
+    macroAssessment += `在古典天體圖譜中，這類靈魂與「${zInfo.god}」的原始圖騰深深共鳴，這意味著在日常表象之下，他們${zInfo.desc}`;
   }
   if (mbti) {
-    macroAssessment += `結合其 ${mbti} 的人格特質，這意味著他們在面對未知人際關係時，傾向於用更理性且有條理的方式整理思緒。`;
+    macroAssessment += `結合其 ${mbti} 的特質，他們在與人初次建立連結時，並不會盲目地釋放熱情，而是習慣在心中先建立一個隱形的觀察座標，確認彼此的邊界與舒適度。`;
   } else {
-    macroAssessment += `目前雖然缺乏 MBTI 數據，但光從星象底蘊來看，其特質已經足夠鮮明。`;
+    macroAssessment += `雖然目前缺乏人格代碼（MBTI）的輔助加權，但其純粹的星象底蘊已經展現出極高的特質清晰度。`;
   }
   
   if (energy === 'high') {
-    macroAssessment += ` 今日見面，他們的情緒頻道處於高能量狀態，更容易被熱情、具備強大故事張力的話題吸引。`;
+    macroAssessment += ` 今日他們的精神頻道正處於高昂的接收狀態，更容易對具備思辨色彩、或是能帶動強大情緒張力的話題產生共鳴。`;
   } else {
-    macroAssessment += ` 今日他們的靈魂更嚮往一場靜謐、有深度且卸下防備的低能量交流。`;
+    macroAssessment += ` 值得注意的是，今日他們的霛魂更傾向於一種靜謐、溫和且卸下防備的低能量沉澱，過於喧鬧的開場可能會讓他們悄悄築起防禦牆。`;
   }
 
-  // 2. 深入客製化話題庫（含原因剖析）
+  // 2. 多維度話題與原因剖析
   let topics = [];
   if (purpose === 'romantic') {
     topics = [
       {
-        title: '聊聊彼此生命中「最著迷的一種感官體驗」',
-        reason: `因為對方的星象特質在浪漫氛圍下非常重視靈魂共振。在當前環境中談論具體而微的感受（如某首特定的歌、某個下雨天的氣味），能迅速繞過表面的社交寒暄，觸動其潛意識中的情感開關。`
+        title: '聊聊彼此生命中「最著迷的一種感官特徵或物件細節」',
+        reason: '對方的星象底蘊在浪漫維度下極度重視精神共振。談論具體而微的感官細節（如某一首特定曲目的器樂編排、或是某個下雨天老書房的氣味），能溫柔地繞過表面社交的寒暄，直接觸動其潛意識中柔軟的情感連結。'
       },
       {
-        title: '分享一個只有少數人知道的「私房生活怪癖」',
-        reason: `這類型的人格在親密關係初期帶有微妙的防衛心。由你主動暴露一個無傷大雅的私密特徵，能建立「心理安全感」，促使他們也樂意向你展現最真實的反差面。`
+        title: '分享一個只有極少數人知道的「私房生活儀式或怪癖」',
+        reason: '這類型的人格在關係建立初期往往帶有不易察覺的客氣與防衛心。由你主動暴露一個無傷大雅、帶有反差感的私密特徵，能迅速在空氣中建立「心理安全感（Psychological Safety）」，進而促使他們也樂意向你展示真實的自己。'
       },
       {
-        title: '探討「假如擁有無限時間，最想去哪個平行時空旅行」',
-        reason: `結合場景的能量流動，對方的思維此時非常適合天馬行空的思想實驗。這不僅能測試彼此的審美契合度，更能讓緊繃的初次見面轉化為一場輕鬆的思緒漫遊。`
+        title: '探討「如果有一整天不被任何人打擾，你最想在哪個角落度過」',
+        reason: '依據當前調諧的環境脈絡，對方的思緒此時最適合進行一場輕量的精神逃離。這道題目既能優雅地探知對方的私密審美，又能讓緊繃的初次會面轉化為一場無壓力的腦海漫遊。'
       }
     ];
   } else if (purpose === 'work') {
     topics = [
       {
-        title: '探討目前領域中，最讓人興奮的一項「未來趨勢或變革」',
-        reason: `擁有卓越思維的專業人士，內心深處都渴望在同儕中找到能對頻的智識夥伴。拋出宏觀且具備前瞻性的議題，能一秒建立你在他們心中的專業份量。`
+        title: '探討目前行業或日常節奏中，最讓你感到興奮的一項「未來變革」',
+        reason: '具備智識深度的人，內心深處都在尋求能夠與其在思維框架上對頻的夥伴。拋出具備前瞻性與宏觀視野的議題，能在一秒內建立起你在對方心中的專業分量與談話價值。'
       },
       {
-        title: '分享自己在專業生涯中「最漂亮的一次失敗與重組經驗」',
-        reason: `與其一味展現完美，不如坦承聊聊有養分的低谷。這展現了極高的心理韌性，能讓重視內在邏輯的他們對你產生極大的信任與敬佩。`
+        title: '聊聊自己在過往專業生涯中，印象最深刻的一段「轉折或低谷重組」',
+        reason: '與其講述完美的成功，不如坦誠地聊聊有養分的失敗。這展現了極高的自我覺察力與心理韌性，能讓重視內在邏輯與誠實特質的他們，對你產生極大的信任感。'
       }
     ];
   } else {
     topics = [
       {
-        title: '最近在你的興趣圈子裡，最讓你廢寢忘食的一個作品或考據',
-        reason: `同好面基最忌諱客套。直接切入最硬核、最充滿熱情的領域，能激發他們骨子裡的分享欲，讓對話能量瞬間拉滿。`
+        title: '最近在你的興趣領域裡，有沒有哪一個作品或考據讓你徹底廢寢忘食？',
+        reason: '同好面基最忌諱流於形式的問候。直接切入最硬核、最充滿熱情靈魂的特定領域，能瞬間點燃他們內心的分享欲，讓對話的能量密度瞬間拉滿。'
       },
       {
-        title: '聊聊彼此在網路上跟現實生活中，落差最大的一個特質',
-        reason: `利用線上線下的反差作為破冰點，能有效消解網路虛擬感帶來的隔閡，是一道非常安全且容易引發笑聲的人際橋樑。`
+        title: '探討彼此在網路螢幕背後，與現實生活實際相處時，反差最大的一個特質',
+        reason: '利用線上線下的落差作為話題切入點，能非常巧妙地消解數位虛擬感帶來的隔閡，是一道非常安全、幽默且極易引發相視一笑的人際橋樑。'
       }
     ];
   }
 
   // 3. 急救台詞
-  let rescueLine = '「今天能坐在這裡一起聊聊真的很難得，放輕鬆，我們就隨心所欲地走這段旅程。」';
-  if (screenshotScores && screenshotScores.freezeRate > 60) {
-    rescueLine = `「實不相瞞，我剛剛上車前還在腦補待會冷場該怎麼辦，但一看到你，我覺得我們可以先聊聊這杯咖啡的主題。」`;
+  let rescueLine = '「今天能坐在這裡一起聊聊天真的很開心，不用有壓力，我們就隨心所欲地跟著感覺走。」';
+  if (screenshotScores && screenshotScores.freezeRate > 55) {
+    rescueLine = `「其實實不相瞞，我出門前還在心裡排練了好幾次冷場該怎麼辦，但現在看到你，我覺得我們可以先聊聊今天這杯咖啡的風味。」`;
   }
 
-  // 4. 地獄雷區
-  let forbidden = '請絕對避免在對話初期過度探聽其隱私底線（例如過往關係或薪資細節），那會讓注重和諧的希臘守護神瞬間築起防衛高牆。';
-  if (zInfo?.id === 'libra') {
-    forbidden = '請絕對避免強迫他們在現場做出兩難的二選一抉擇（例如：這兩家店哪家比較好），這會引發天秤正義女神的焦慮，打破精心維持的平衡表面。';
+  // 4. 雷區
+  let forbidden = '請絕對避免在對話初期過度探聽其隱私細線（例如過往關係細節或具體薪資），那會讓注重安全邊界的守護神瞬間降下冰封閘門。';
+  if (zodiac === 'libra' || zodiac === 'virgo') {
+    forbidden = '請絕對避免在現場強迫他們做出兩難的抉擇（例如：強烈追問這兩道菜哪個好）。這會打破他們精心維持的內心和諧，引發潛意識的焦慮。';
   }
 
   return {
-    targetName,
+    targetName: zInfo ? zInfo.label : (mbti || '觀測對象'),
+    godName: zInfo ? zInfo.god : '神祕星體',
+    survivalRate,
     macroAssessment,
     topics,
     rescueLine,
@@ -124,12 +133,12 @@ export function generateComprehensiveAnalysis({ zodiac, mbti, purpose, environme
 
 export function analyzeScreenshot(file) {
   let hash = 0;
-  const name = file ? file.name : 'default';
+  const name = file ? file.name : 'signal';
   for (let i = 0; i < name.length; i++) {
     hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
   }
-  const freezeRate = (hash % 60) + 20;
-  const balanceScore = ((hash >> 2) % 50) + 45;
-  const auraLevel = ((hash >> 4) % 40) + 55;
+  const freezeRate = (hash % 50) + 25;
+  const balanceScore = ((hash >> 2) % 40) + 50;
+  const auraLevel = ((hash >> 4) % 35) + 60;
   return { freezeRate, balanceScore, auraLevel };
 }
