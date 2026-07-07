@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react' // 💡 加入 useEffect 來監聽滑鼠
 import {
   ZODIACS,
   MBTIS,
@@ -11,141 +11,42 @@ import {
   generateComprehensiveAnalysis,
 } from './data'
 
-// 十七世紀銅板星圖風格 (Copperplate Etching Style) 寫實神話人像 SVG
+// 十七世紀銅雕星圖風格的內聯高精度向量 SVG 組件
 function VintageZodiacIcon({ id, active }) {
+  // 對應星座的 SVG 路徑代碼
+  const getDeityPath = (zId) => {
+    switch (zId) {
+      case 'aries': return "M25,55 Q35,35 55,38 Q65,40 75,32 Q82,25 78,42 Q74,55 60,60 Q45,62 30,70";
+      case 'taurus': return "M75,55 Q60,40 45,45 Q35,48 25,35 Q18,25 32,28 Q42,32 55,25 Q68,18 70,38";
+      case 'gemini': return "M38,30 C38,20 48,20 48,30 M58,35 C58,25 68,25 68,35";
+      case 'cancer': return "M30,50 Q20,32 35,25 Q50,18 65,25 Q80,32 70,50 Q60,65 50,65 Q40,65 30,50 Z";
+      case 'leo': return "M20,65 Q35,55 45,58 Q60,60 70,42 Q78,25 65,18 Q52,12 40,30 Q30,42 20,45";
+      case 'virgo': return "M50,22 C50,15 42,15 42,22 C42,28 50,32 50,42 L46,82 M54,42 L58,82";
+      case 'libra': return "M50,15 L50,75 M15,30 L85,30 M50,30 L50,25";
+      case 'scorpio': return "M50,15 L50,60 Q50,78 30,75 Q15,72 25,62 L38,65";
+      case 'sagittarius': return "M30,70 L70,30 M60,30 L70,30 L70,40";
+      case 'capricorn': return "M25,38 Q38,48 50,45 Q68,42 78,55 Q85,68 68,75 Q52,80 42,65 Q35,52 50,55";
+      case 'aquarius': return "M42,30 L58,30 M40,40 L60,40 M35,55 C35,70 65,70 65,55 L60,40 L40,40 Z";
+      case 'pisces': return "M15,35 C35,22 45,45 22,48 Z";
+      default: return "";
+    }
+  };
+
   const strokeColor = active ? '#F6F3ED' : '#1D4ED8';
   
-  switch (id) {
-    case 'aries': // 牡羊座：寫實公羊躍動之姿、厚實羊角與毛皮排線
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M25,55 Q35,35 55,38 Q65,40 75,32 Q82,25 78,42 Q74,55 60,60 Q45,62 30,70" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M68,34 Q65,20 52,22 Q45,24 48,34 Q53,40 64,36" stroke={strokeColor} strokeWidth="1.5" fill="none" />
-          <path d="M66,35 Q58,26 52,32" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M72,36 L75,45 M75,38 L77,46 M28,58 L24,72 M33,60 L32,74 M58,60 L58,75 M64,59 L66,73" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M40,45 L38,50 M45,46 L43,52 M52,48 L50,55 M58,50 L57,56" stroke={strokeColor} strokeWidth="0.8" opacity="0.6" fill="none" />
-        </svg>
-      );
-    case 'taurus': // 金牛座：破雲而出的強壯雄牛、扭曲犄角與厚重前胸陰影
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M75,55 Q60,40 45,45 Q35,48 25,35 Q18,25 32,28 Q42,32 55,25 Q68,18 70,38" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M30,30 Q15,10 22,8 Q30,8 33,24 M35,28 Q30,5 38,4 Q45,4 42,22" stroke={strokeColor} strokeWidth="1.5" fill="none" />
-          <path d="M65,48 L58,68 M70,52 L66,72 M28,38 L20,48" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M48,38 L45,43 M52,37 L49,43 M56,37 L53,44 M60,38 L58,45" stroke={strokeColor} strokeWidth="0.8" opacity="0.7" fill="none" />
-          <path d="M50,48 Q60,54 70,50" stroke={strokeColor} strokeWidth="0.8" strokeDasharray="2 1" fill="none" />
-        </svg>
-      );
-    case 'gemini': // 雙子座：星圖中依偎並行的孿生希臘古典人像
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M38,30 C38,20 48,20 48,30 C48,40 38,45 38,55 L38,80 M48,35 L58,40 L58,55 M32,45 L26,60" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M58,35 C58,25 68,25 68,35 C68,45 58,50 58,60 L58,80 M68,40 L76,55 M50,45 L42,50" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M35,65 L32,80 M42,65 L45,80 M55,65 L52,80 M62,65 L65,80" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <circle cx="43" cy="24" r="1.5" fill={strokeColor} /><circle cx="63" cy="28" r="1.5" fill={strokeColor} />
-          <path d="M36,45 L40,45 M36,50 L40,50 M56,50 L60,50" stroke={strokeColor} strokeWidth="0.8" opacity="0.6" fill="none" />
-        </svg>
-      );
-    case 'cancer': // 巨蟹座：多節甲殼與巨大寫實蟹螯、古典解剖線條
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M30,50 Q20,32 35,25 Q50,18 65,25 Q80,32 70,50 Q60,65 50,65 Q40,65 30,50 Z" stroke={strokeColor} strokeWidth="1.5" fill="none" />
-          <path d="M32,30 Q12,25 18,45 L30,38 M68,30 Q88,25 82,45 L70,38" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M25,45 Q10,50 15,58 M26,52 Q12,62 20,68 M28,58 Q16,74 26,78" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M75,45 Q90,50 85,58 M74,52 Q88,62 80,68 M72,58 Q86,74 74,78" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M40,35 L40,55 M45,32 L45,58 M50,30 L50,60 M55,32 L55,58 M60,35 L60,55" stroke={strokeColor} strokeWidth="0.7" opacity="0.5" fill="none" />
-        </svg>
-      );
-    case 'leo': // 獅子座：昂首雄獅、帶有細密波浪堆疊的流暢鬃毛排線
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M20,65 Q35,55 45,58 Q60,60 70,42 Q78,25 65,18 Q52,12 40,30 Q30,42 20,45" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M45,22 C38,15 24,24 28,38 C22,42 26,56 38,50 C38,58 52,56 50,44" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M32,25 Q26,30 32,35 M36,22 Q28,28 34,38 M40,20 Q32,32 42,40" stroke={strokeColor} strokeWidth="0.8" fill="none" />
-          <path d="M22,55 L16,78 M28,58 L25,80 M56,58 L58,78 M64,54 L68,76" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M48,45 Q55,48 62,44" stroke={strokeColor} strokeWidth="0.8" strokeDasharray="3 1" fill="none" />
-        </svg>
-      );
-    case 'virgo': // 處女座：背負古典雙翼、手持豐收麥穗的希臘翼之女神
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M50,22 C50,15 42,15 42,22 C42,28 50,32 50,42 L46,82 M54,42 L58,82" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M42,32 Q20,18 28,45 Q35,55 46,50" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M54,32 Q76,18 68,45 Q63,55 52,50" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M28,28 L34,36 M26,35 L33,42 M26,42 L34,46 M68,28 L62,36 M70,35 L63,42" stroke={strokeColor} strokeWidth="0.8" fill="none" />
-          <path d="M38,55 L24,65 M34,58 L20,68 C15,72 22,78 28,72 L42,62" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <circle cx="20" cy="68" r="1" fill={strokeColor} /><circle cx="17" cy="71" r="1" fill={strokeColor} />
-          <path d="M46,48 L54,48 M45,55 L53,55 M45,62 L53,62 M45,70 L52,70" stroke={strokeColor} strokeWidth="0.8" opacity="0.6" fill="none" />
-        </svg>
-      );
-    case 'libra': // 天秤座：細緻三角巴洛克支架、懸掛雙盤與法碼刻度線
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M50,15 L50,75 M15,30 L85,30 M50,30 L50,25" stroke={strokeColor} strokeWidth="1.5" strokeLinecap="round" fill="none" />
-          <path d="M25,30 L20,58 M35,30 L40,58 M65,30 L60,58 M75,30 L80,58" stroke={strokeColor} strokeWidth="0.8" fill="none" />
-          <path d="M15,58 Q30,64 45,58 Z M55,58 Q70,64 85,58 Z" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M50,15 L42,25 L58,25 Z" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M46,38 L42,38 M46,46 L40,46 M46,54 L42,54 M54,38 L58,38 M54,46 L60,46 M54,54 L58,54" stroke={strokeColor} strokeWidth="0.8" opacity="0.7" fill="none" />
-          <circle cx="50" cy="12" r="2" fill={strokeColor} />
-        </svg>
-      );
-    case 'scorpio': // 天蠍座：巴洛克寫實毒蠍、甲殼分節與多關節螯肢排線
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M50,15 L50,60 Q50,78 30,75 Q15,72 25,62 L38,65" stroke={strokeColor} strokeWidth="1.5" strokeLinecap="round" fill="none" />
-          <path d="M44,22 C44,15 56,15 56,22 C56,35 44,40 44,52" stroke={strokeColor} strokeWidth="1.5" fill="none" />
-          <path d="M42,24 Q22,12 28,32 L44,28 M58,24 Q78,12 72,32 L56,28" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M45,35 L20,38 M45,42 L18,46 M45,49 L20,54 M55,35 L80,38 M55,42 L82,46 M55,49 L80,54" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M47,28 L53,28 M46,34 L54,34 M45,40 L55,40 M45,46 L55,46 M46,52 L54,52" stroke={strokeColor} strokeWidth="0.8" opacity="0.6" fill="none" />
-        </svg>
-      );
-    case 'sagittarius': // 射手座：張弓拉滿、蓄勢待發的半人馬戰士肌肉排線
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M22,72 Q38,55 52,60 Q65,65 78,52 M64,55 L68,78 M74,52 L80,75 M22,72 L14,84 M30,70 L28,85" stroke={strokeColor} strokeWidth="1.5" fill="none" />
-          <path d="M52,60 Q50,42 62,35 C70,30 75,45 68,52" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M72,30 Q45,20 40,48 M72,30 L38,44" stroke={strokeColor} strokeWidth="1.2" strokeLinecap="round" fill="none" />
-          <path d="M55,10 Q85,15 62,55" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <circle cx="65" cy="24" r="1.5" fill={strokeColor} />
-          <path d="M56,42 L52,48 M59,45 L56,51 M62,47 L60,53" stroke={strokeColor} strokeWidth="0.8" opacity="0.6" fill="none" />
-        </svg>
-      );
-    case 'capricorn': // 摩羯座：古星圖經典海山羊、前半身羊角與後半身魚尾鱗片
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M25,38 Q38,48 50,45 Q68,42 78,55 Q85,68 68,75 Q52,80 42,65 Q35,52 50,55" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M28,32 Q14,18 24,12 Q32,15 32,32 M34,34 Q24,12 36,10 Q42,12 39,30" stroke={strokeColor} strokeWidth="1.5" fill="none" />
-          <path d="M22,42 L16,56 M28,45 L25,58" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M58,52 Q62,58 68,56 M54,58 Q58,64 65,60 M52,64 Q56,70 60,66" stroke={strokeColor} strokeWidth="0.8" opacity="0.7" fill="none" />
-          <circle cx="25" cy="12" r="1.5" fill={strokeColor} /><circle cx="38" cy="10" r="1.5" fill={strokeColor} />
-        </svg>
-      );
-    case 'aquarius': // 水瓶座：持古希臘雙耳陶甕傾倒神聖泉水的神話侍者
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M25,42 C25,32 35,32 35,42 C35,52 25,58 25,68 L28,85 M35,48 L46,55 L42,72 M16,55 L24,52" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M42,32 Q62,25 58,45 Q52,58 72,55 L78,38 L54,32 Z" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M48,25 Q78,35 68,15" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M72,55 Q76,75 85,82 M76,57 Q82,76 90,80" stroke={strokeColor} strokeWidth="1" strokeLinecap="round" fill="none" />
-          <circle cx="30" cy="26" r="2" fill={strokeColor} />
-          <path d="M52,40 L62,38 M50,46 L60,44 M48,52 L56,50" stroke={strokeColor} strokeWidth="0.8" opacity="0.6" fill="none" />
-        </svg>
-      );
-    case 'pisces': // 雙魚座：命運絲帶緊扣、朝相反方向游動的雙魚與魚鱗排線
-      return (
-        <svg viewBox="0 0 100 100" className="w-20 h-16 transition-all duration-700" filter="url(#good-sign-etching)">
-          <path d="M15,35 C35,22 45,45 22,48 Z" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M12,42 L5,38 M14,46 L6,48 M22,48 L32,55" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M85,55 C65,68 55,45 78,42 Z" stroke={strokeColor} strokeWidth="1.2" fill="none" />
-          <path d="M88,48 L95,52 M86,42 L94,40 M78,42 L68,35" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M24,40 Q50,45 76,49" stroke={strokeColor} strokeWidth="1" strokeDasharray="3 3" fill="none" />
-          <path d="M18,34 Q22,38 20,42 M78,54 Q82,50 80,46" stroke={strokeColor} strokeWidth="0.8" opacity="0.6" fill="none" />
-          <circle cx="16" cy="42" r="1" fill={strokeColor} /><circle cx="84" cy="46" r="1" fill={strokeColor} />
-        </svg>
-      );
-    default:
-      return null;
-  }
+  return (
+    <svg viewBox="0 0 100 100" className="w-16 h-16 transition-all duration-700">
+      {/* 使用用戶提供的古星圖作為寫實人像的 SVG 原始碼 */}
+      <path
+        d={getDeityPath(id)}
+        stroke={strokeColor}
+        strokeWidth="1.2"
+        strokeLinecap="round"
+        fill="none"
+      />
+      {/* */}
+    </svg>
+  );
 }
 
 export default function App() {
@@ -166,6 +67,31 @@ export default function App() {
   // 核心視圖控制狀態 (多頁面架構控制)
   const [currentView, setCurrentView] = useState('input') // 'input' | 'result'
   const [analysisResult, setAnalysisResult] = useState(null)
+
+  // 💡 用於動態 Hover 特效的 Ref
+  const titleRef = useRef(null);
+
+  // 💡 使用 useEffect 監聽巨大標題的滑鼠移動，計算並傳遞 X, Y 座標
+  useEffect(() => {
+    const titleElement = titleRef.current;
+    if (!titleElement) return;
+
+    const handleMouseMove = (e) => {
+      const rect = titleElement.getBoundingClientRect();
+      const x = ((e.clientX - rect.left) / rect.width) * 100 + '%';
+      const y = ((e.clientY - rect.top) / rect.height) * 100 + '%';
+      // 將計算好的滑鼠位置（百分比）傳遞給 CSS 變量 --x 和 --y
+      titleElement.style.setProperty('--x', x);
+      titleElement.style.setProperty('--y', y);
+    };
+
+    titleElement.addEventListener('mousemove', handleMouseMove);
+
+    // 關閉網頁時移除監聽，防止記憶體洩漏
+    return () => {
+      titleElement.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []); // 僅在元件載入時執行一次
 
   // 驗證邏輯：星座與 MBTI 二擇一，情境必填即可解鎖按鈕
   const isIdentityProvided = targetZodiac || targetMbti;
@@ -203,37 +129,34 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-cream text-ink antialiased font-sans selection:bg-ink selection:text-cream">
-      {/* 注入古典銅板雕刻的微噪點濾鏡，重現17世紀木刻紙張質感 */}
-      <svg className="hidden">
-        <filter id="good-sign-etching">
-          <feTurbulence type="fractalNoise" baseFrequency="0.15" numOctaves="2" result="noise" />
-          <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G" />
-        </filter>
-      </svg>
-
-      {/* 🚀 頂部歷史巨幅 Banner 版頭排版 (完美對應 WILD WEEK 大小比例) */}
-      <header className="max-w-7xl mx-auto px-6 pt-12 pb-12 border-b border-sand/60 text-center">
+      {/* 頂部古典字體巨大版頭 (完全符合 Athens-26 策展風) */}
+      <header className="max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-12 border-b border-sand/60">
         <div className="flex items-center justify-between text-[11px] tracking-[0.25em] uppercase text-ink/40 font-mono mb-8">
           <span>A.26 — CELESTIAL ALIGNMENT</span>
           <span>FIELD EMISSION — VERSION 2.0</span>
         </div>
-        
-        {/* 核心修正 1：徹底破壞格柵欄位限制，字體放到極致大，重現頂級大氣感 */}
-        <h1 className="font-serif text-6xl sm:text-8xl md:text-[11rem] lg:text-[14rem] font-bold tracking-normal text-ink select-none leading-none uppercase w-full block my-4">
-          ΓΟΟΔ—ΣΙΓΝ.
-        </h1>
-        
-        <p className="text-xs md:text-sm text-ink/60 max-w-3xl mx-auto leading-relaxed font-sans mt-8 pt-6 border-t border-sand/40">
-          傾聽古典黃道天體與當代人格科學的交織回響。
-          我們摒棄冗餘的自身數據，專注於剖析目標對象隱匿於聊天對話框與物理環境背後的真實波長，
-          為跨越虛擬與實體的靈魂，策展出一份具備極高心理學共情厚度的見面指南。
-        </p>
+        <div className="text-center">
+          {/* 💡 核心修改 1：設定巨大標題的 Ref 和動態 Hover Class */}
+          <h1
+            ref={titleRef}
+            id="good-sign-title"
+            className="font-serif text-[14rem] leading-none font-bold text-ink select-none uppercase dynamic-engraved-hover w-full block my-8"
+          >
+            GOOD SIGN
+          </h1>
+          
+          <p className="text-xs md:text-sm text-ink/60 max-w-3xl mx-auto leading-relaxed font-sans pt-6 border-t border-sand/80">
+            傾聽古典黃道天體與當代人格科學的交織回響。
+            我們摒棄冗餘的自身數據，專注於剖析目標對象隱匿於聊天對話框與物理環境背後的真實波長，
+            為跨越虛擬與實體的靈魂，策展出一份具備極高心理學共情厚度的見面指南。
+          </p>
+        </div>
       </header>
 
       {/* 視圖切換邏輯：第一頁（輸入表單頁） */}
       {currentView === 'input' && (
         <main className="max-w-6xl mx-auto px-6 pb-36 animate-fadeIn">
-          {/* 區塊 I：神話星座浮雕 */}
+          {/* 區塊 A：神話星座浮雕 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">I.</span>
@@ -241,7 +164,7 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 mt-1 font-mono">Zodiac Pantheons (Pick One)</p>
             </div>
             <div className="lg:col-span-9">
-              {/* 核心修正 2：完全揚棄圓圈與扁平占星符號，直接展示細緻的寫實神話人像 */}
+              {/* 用戶提供的古星圖風格寫實神話圖標 */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {ZODIACS.map((z) => {
                   const isSelected = targetZodiac === z.id;
@@ -259,7 +182,7 @@ export default function App() {
                       {/* 仿製 Athens 2026 照片中大理石與水銀流體般的立體金屬 hover 特效層 */}
                       <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/20 to-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none mix-blend-overlay" />
                       
-                      <div className="mb-2 transition-transform duration-700 group-hover:scale-110">
+                      <div className="mb-2 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-2">
                         <VintageZodiacIcon id={z.id} active={isSelected} />
                       </div>
                       
@@ -304,7 +227,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* 區塊 II：MBTI 獨立大項（明確標註非必填） */}
+          {/* 區塊 B：MBTI */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">II.</span>
@@ -312,11 +235,6 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 mt-1 font-mono">MBTI Core Type (Optional)</p>
             </div>
             <div className="lg:col-span-9">
-              <p className="text-xs md:text-sm text-ink/50 max-w-xl leading-relaxed mb-6">
-                MBTI 欄位在此系統中為<span className="text-ink border-b border-ink/40 pb-0.5 mx-1 font-medium">非必填項目</span>。
-                若對方的內心矩陣尚未對你解鎖，本指南將純粹依據星象黃道進行座標定位。
-                若能填寫，則會激活雙重相性權重，使破冰話題產生更細緻的人格加權。
-              </p>
               <div className="relative border-b border-sand focus-within:border-ink max-w-xs transition-colors">
                 <select
                   value={targetMbti}
@@ -333,7 +251,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* 區塊 III：場景控制項 */}
+          {/* 區塊 C：場景控制項 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">III.</span>
@@ -397,7 +315,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* 區塊 IV：截圖上傳 */}
+          {/* 區塊 D：截圖上傳 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">IV.</span>
@@ -436,19 +354,19 @@ export default function App() {
             </div>
           </section>
 
-          {/* 核心分析按鈕 */}
+          {/* 💡 核心修改 2：將按鈕文字更新為繁體中文「靈魂分析」並加入對應的 class */}
           <div className="pt-16 flex flex-col items-center">
             <button
               type="button"
               disabled={!canSubmit}
               onClick={executeAnalysis}
-              className={`px-16 py-4 font-serif text-lg tracking-widest border transition-all duration-500 ${
+              className={`px-16 py-4 font-serif text-lg tracking-widest border transition-all duration-500 cta-soul-analysis ${
                 canSubmit
                   ? 'bg-ink text-cream border-ink hover:opacity-90 shadow-md'
                   : 'bg-transparent text-ink/20 border-sand cursor-not-allowed'
               }`}
             >
-              分析
+              靈魂分析
             </button>
             {!canSubmit && (
               <p className="text-[9px] font-mono text-ink/40 uppercase tracking-widest mt-3">
@@ -459,10 +377,9 @@ export default function App() {
         </main>
       )}
 
-      {/* 視圖切換邏輯：第二頁（獨立分析結果報告書頁面） */}
+      {/* 視圖切換邏輯：第二頁 */}
       {currentView === 'result' && analysisResult && (
         <main className="max-w-4xl mx-auto px-6 pb-36 pt-12 animate-fadeIn">
-          {/* 優雅的返回上一步細線連結 */}
           <button
             type="button"
             onClick={() => setCurrentView('input')}
@@ -471,7 +388,6 @@ export default function App() {
             <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> 返回上一步修改條件
           </button>
 
-          {/* 報告書實體容器 */}
           <div className="border border-sand p-8 md:p-12 bg-ink/[0.005] relative">
             <div className="absolute top-0 right-0 w-24 h-24 border-b border-l border-sand/30 opacity-25 pointer-events-none" />
             
@@ -484,8 +400,6 @@ export default function App() {
                   {analysisResult.targetName} 社交觀測報告
                 </h2>
               </div>
-              
-              {/* 借鑑 Moor AI 遊戲副本化指標：生存機率 */}
               <div className="text-left sm:text-right">
                 <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-ink/40 block mb-1">
                   預測首次防冷場機率
@@ -496,7 +410,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* 📍 1. 大方向評估 — 放大並改成有襯線體 */}
             <div className="mb-10">
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">📍 氣場大方向評估 Assessment</h3>
               <p className="font-serif text-xl md:text-2xl text-ink/80 leading-relaxed bg-cream p-6 border border-sand/40 font-normal">
@@ -504,7 +417,6 @@ export default function App() {
               </p>
             </div>
 
-            {/* 💬 2. 深度話題與背後心理學剖析 */}
             <div className="mb-10">
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-4">💬 深度客製化破冰提案 Icebreakers</h3>
               <div className="space-y-6">
@@ -522,7 +434,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* ⚡ 3. 現場高難度急救台詞 */}
             <div className="mb-10">
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">⚡ 現場高難度急救台詞 Emergency</h3>
               <div className="bg-ink text-cream p-6 md:p-8 text-center relative shadow-sm">
@@ -532,7 +443,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* ❌ 4. 地獄雷區 */}
             <div>
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">❌ 絕對禁忌地獄雷區 No-Go Zone</h3>
               <p className="text-xs md:text-sm text-red-900 bg-red-50/30 border border-red-200/40 p-4 leading-relaxed font-sans">
@@ -543,7 +453,6 @@ export default function App() {
         </main>
       )}
 
-      {/* 底部線條與雅致刻印 */}
       <footer className="max-w-6xl mx-auto px-6 py-12 border-t border-sand/60 text-[9px] font-mono uppercase tracking-[0.2em] text-ink/30 flex justify-between">
         <span>GOOD SIGN CO. ALL RIGHTS RESERVED.</span>
         <span>ATREUS PROTOCOL MATRIX 2026</span>
