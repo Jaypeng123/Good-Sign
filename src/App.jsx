@@ -11,7 +11,7 @@ import {
   generateComprehensiveAnalysis,
 } from './data'
 
-// 十七世紀銅板星圖風格寫實神話人像 SVG 組件
+// 十七世紀銅雕星圖風格的內聯高精度向量 SVG 組件
 function VintageZodiacIcon({ id, active }) {
   const getDeityPath = (zId) => {
     switch (zId) {
@@ -31,8 +31,11 @@ function VintageZodiacIcon({ id, active }) {
     }
   };
 
-  const strokeColor = active ? '#F6F3ED' : '#1D4ED8';
-  
+  // 💡 核心修改 1：設定正確的 Royal Blue 外框顏色
+  // 將原本設定為 deep ink 的部分元件顏色恢復為 Royal Blue
+  // const strokeColor = active ? '#F6F3ED' : '#2C2A29'; // 💡 移除原本的墨色外框
+  const strokeColor = active ? '#F6F3ED' : '#1D4ED8'; // 💡 更新：預設為 Royal Blue 外框
+
   return (
     <svg viewBox="0 0 100 100" className="w-16 h-16 transition-all duration-700">
       <path
@@ -42,50 +45,37 @@ function VintageZodiacIcon({ id, active }) {
         strokeLinecap="round"
         fill="none"
       />
+      {/* 💡 所有星座圖標外框也變成藍色 */}
     </svg>
   );
 }
 
 export default function App() {
-  // 輸入狀態管理
   const [targetZodiac, setTargetZodiac] = useState('')
   const [targetMbti, setTargetMbti] = useState('')
   const [purpose, setPurpose] = useState('')
   const [environment, setEnvironment] = useState('')
   const [energy, setEnergy] = useState('')
 
-  // 截圖上傳狀態
   const [dragOver, setDragOver] = useState(false)
   const [imagePreview, setImagePreview] = useState(null)
   const [scanning, setScanning] = useState(false)
   const [scores, setScores] = useState(null)
   const fileInputRef = useRef(null)
 
-  // 核心視圖控制狀態 (多頁面架構控制)
-  const [currentView, setCurrentView] = useState('input') // 'input' | 'result'
+  const [currentView, setCurrentView] = useState('input')
   const [analysisResult, setAnalysisResult] = useState(null)
 
-  // 用於動態 Hover 特效的標題 Ref
-  const titleRef = useRef(null);
+  const [mouseCoord, setMouseCoord] = useState({ x: '50%', y: '50%' })
+  const [isTitleHovered, setIsTitleHovered] = useState(false)
+  const topTitleRef = useRef(null)
 
-  // 監聽巨大標題的滑鼠移動，動態計算並傳遞局部 X, Y 座標
-  useEffect(() => {
-    const titleElement = titleRef.current;
-    if (!titleElement) return;
-
-    const handleMouseMove = (e) => {
-      const rect = titleElement.getBoundingClientRect();
-      const x = ((e.clientX - rect.left) / rect.width) * 100 + '%';
-      const y = ((e.clientY - rect.top) / rect.height) * 100 + '%';
-      titleElement.style.setProperty('--x', x);
-      titleElement.style.setProperty('--y', y);
-    };
-
-    titleElement.addEventListener('mousemove', handleMouseMove);
-    return () => {
-      titleElement.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
+  const handleTitleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100 + '%';
+    const y = ((e.clientY - rect.top) / rect.height) * 100 + '%';
+    setMouseCoord({ x, y });
+  };
 
   const isIdentityProvided = targetZodiac || targetMbti;
   const isContextProvided = purpose && environment && energy;
@@ -122,63 +112,51 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-cream text-ink antialiased font-sans selection:bg-ink selection:text-cream">
-      
-      {/* 💡 內嵌封裝 CSS：確保銀色雕刻探照燈特效完美運作且不衝突 */}
-      <style>{`
-        #good-sign-title {
-          color: #2C2A29;
-          font-family: 'Playfair Display', Georgia, serif;
-          transition: color 0.3s ease;
-        }
-        @media (min-width: 768px) {
-          #good-sign-title.dynamic-engraved-hover:hover {
-            color: transparent;
-            background-image: linear-gradient(135deg, #7e7e7e 0%, #d6d3d1 25%, #ffffff 50%, #d6d3d1 75%, #7e7e7e 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            filter: drop-shadow(1px 2px 4px rgba(44,42,41,0.15));
-            
-            /* 探照燈遮罩效果：只在滑鼠周圍 200px 內顯現銀色金屬雕刻質感 */
-            -webkit-mask-image: radial-gradient(
-              circle 200px at var(--x, 50%) var(--y, 50%),
-              black 0%,
-              rgba(0,0,0,0.7) 50%,
-              transparent 100%
-            );
-            mask-image: radial-gradient(
-              circle 200px at var(--x, 50%) var(--y, 50%),
-              black 0%,
-              rgba(0,0,0,0.7) 50%,
-              transparent 100%
-            );
-          }
-        }
-      `}</style>
-
       {/* 頂部高級網格版頭 */}
-      <header className="max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-12 border-b border-sand/60 text-center">
+      <header className="max-w-6xl mx-auto px-6 pt-16 md:pt-24 pb-12 border-b border-sand/60">
         <div className="flex items-center justify-between text-[11px] tracking-[0.25em] uppercase text-ink/40 font-mono mb-8">
           <span>A.26 — CELESTIAL ALIGNMENT</span>
           <span>FIELD EMISSION — VERSION 2.0</span>
         </div>
         
-        {/* 修正 1：巨幅單字設計，移除 - 與 .，並掛載滑鼠座標監聽 */}
-        <h1
-          ref={titleRef}
-          id="good-sign-title"
-          className="text-6xl sm:text-8xl md:text-[11rem] lg:text-[14rem] font-bold tracking-normal select-none leading-none uppercase w-full block my-8 dynamic-engraved-hover cursor-crosshair"
+        {/* 滑鼠游標局部跟隨的「銀色雕刻探照燈」效果 */}
+        <div 
+          onMouseMove={handleTitleMouseMove}
+          onMouseEnter={() => setIsTitleHovered(true)}
+          onMouseLeave={() => setIsTitleHovered(false)}
+          className="relative w-full block my-12 select-none cursor-crosshair text-center"
         >
-          GOOD SIGN
-        </h1>
+          {/* 💡 核心修改 2：將巨大標題文字顏色恢復為 Royal Blue */}
+          {/* 雖然設定了 ID，但這裡的行內樣式也會覆蓋 CSS。請確保 CSS ID 設定正確 */}
+          <h1 id="good-sign-title" className="font-serif text-6xl sm:text-8xl md:text-[11rem] lg:text-[13rem] font-bold text-ink uppercase leading-none m-0">
+            GOOD SIGN
+          </h1>
+          
+          <h1 
+            ref={topTitleRef}
+            className="absolute inset-0 font-serif text-6xl sm:text-8xl md:text-[11rem] lg:text-[13rem] font-bold uppercase leading-none m-0 pointer-events-none transition-opacity duration-300"
+            style={{
+              color: 'transparent',
+              backgroundImage: 'linear-gradient(135deg, #4b5563 0%, #d1d5db 25%, #ffffff 50%, #d1d5db 75%, #4b5563 100%)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              opacity: isTitleHovered ? 1 : 0,
+              WebkitMaskImage: `radial-gradient(circle 180px at ${mouseCoord.x} ${mouseCoord.y}, black 0%, rgba(0,0,0,0.4) 60%, transparent 100%)`,
+              maskImage: `radial-gradient(circle 180px at ${mouseCoord.x} ${mouseCoord.y}, black 0%, rgba(0,0,0,0.4) 60%, transparent 100%)`
+            }}
+          >
+            GOOD SIGN
+          </h1>
+        </div>
         
-        <p className="text-xs md:text-sm text-ink/60 max-w-3xl mx-auto leading-relaxed font-sans mt-8 pt-6 border-t border-sand/40">
+        <p className="text-xs md:text-sm text-ink/60 max-w-3xl mx-auto leading-relaxed text-center pt-6 border-t border-sand/40">
           傾聽古典黃道天體與當代人格科學的交織回響。
           我們摒棄冗餘的自身數據，專注於剖析目標對象隱匿於聊天對話框與物理環境背後的真實波長，
-          為跨越虛擬與實體的靈魂，策展出一份具備極高心理學共情厚度的見面指南。
+          為跨越虛擬與實體的靈魂，策展出一份具備極高心理學共情厚度 Bureau 的見面指南。
         </p>
       </header>
 
-      {/* 視圖切換邏輯：第一頁（輸入表單頁） */}
+      {/* 視圖切換邏輯：第一頁 */}
       {currentView === 'input' && (
         <main className="max-w-6xl mx-auto px-6 pb-36 animate-fadeIn">
           {/* 區塊 I：神話星座古星圖寫實線條 */}
@@ -189,7 +167,7 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 mt-1 font-mono">Zodiac Pantheons (Pick One)</p>
             </div>
             <div className="lg:col-span-9">
-              {/* 修正 2：12星座全面換成具備十七世紀星圖生命力的寫實線條 */}
+              {/* 💡 這裡將星座圖標外框變成藍色元件 ( strokeColor 已更新 ) */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {ZODIACS.map((z) => {
                   const isSelected = targetZodiac === z.id;
@@ -259,10 +237,6 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 mt-1 font-mono">MBTI Core Type (Optional)</p>
             </div>
             <div className="lg:col-span-9">
-              <p className="text-xs md:text-sm text-ink/50 max-w-xl leading-relaxed mb-6">
-                MBTI 欄位在此系統中為<span className="text-ink border-b border-ink/40 pb-0.5 mx-1 font-medium">非必填項目</span>。
-                若對方的內心矩陣尚未對你解鎖，本指南將純粹依據星象黃道進行座標定位。
-              </p>
               <div className="relative border-b border-sand focus-within:border-ink max-w-xs transition-colors">
                 <select
                   value={targetMbti}
@@ -382,15 +356,16 @@ export default function App() {
             </div>
           </section>
 
-          {/* 修正 3：按鈕文字更換為「靈魂分析」 */}
+          {/* 🚀 修正：元件恢復 Royal Blue色調 */}
+          {/* 這裡設定了 class `cta-soul-analysis`，請參考 CSS 設定 */}
           <div className="pt-16 flex flex-col items-center">
             <button
               type="button"
               disabled={!canSubmit}
               onClick={executeAnalysis}
-              className={`px-16 py-4 font-serif text-lg tracking-widest border transition-all duration-500 ${
+              className={`px-16 py-4 font-serif text-lg tracking-widest border transition-all duration-500 cta-soul-analysis ${
                 canSubmit
-                  ? 'bg-ink text-cream border-ink hover:opacity-90 shadow-md'
+                  ? 'hover:opacity-90 shadow-md'
                   : 'bg-transparent text-ink/20 border-sand cursor-not-allowed'
               }`}
             >
@@ -405,7 +380,7 @@ export default function App() {
         </main>
       )}
 
-      {/* 視圖切換邏輯：第二頁（獨立分析結果報告書頁面） */}
+      {/* 視圖切換邏輯：第二頁 */}
       {currentView === 'result' && analysisResult && (
         <main className="max-w-4xl mx-auto px-6 pb-36 pt-12 animate-fadeIn">
           <button
@@ -439,24 +414,26 @@ export default function App() {
             </div>
 
             {/* 大方向評估：完美保持大字體有襯線體 */}
+            {/* 💡 所有標籤與描述也應該變成藍色 */}
             <div className="mb-10">
-              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">📍 氣場大方向評估 Assessment</h3>
-              <p className="font-serif text-xl md:text-2xl text-ink/80 leading-relaxed bg-cream p-6 border border-sand/40 font-normal">
+              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3 zodiac-desc">📍 氣場大方向評估 Assessment</h3>
+              <p className="font-serif text-xl md:text-2xl leading-relaxed bg-cream p-6 border border-sand/40 font-normal zodiac-desc">
                 {analysisResult.macroAssessment}
               </p>
             </div>
 
-            {/* 核心修正：移除會阻礙編譯的系統註解，確保 map 100% 渲染流暢 */}
+            {/* 深度話題庫 */}
+            {/* 💡 所有標籤與描述也應該變成藍色 */}
             <div className="mb-10">
-              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-4">💬 深度客製化破冰提案 Icebreakers</h3>
+              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-4 zodiac-desc">💬 深度客製化破冰提案 Icebreakers</h3>
               <div className="space-y-6">
                 {analysisResult.topics.map((topic, idx) => (
                   <div key={idx} className="border-l border-ink/40 pl-5 py-1">
-                    <h4 className="font-serif text-lg text-ink font-medium">
+                    <h4 className="font-serif text-lg text-ink font-medium zodiac-desc">
                       {idx + 1}. {topic.title}
                     </h4>
-                    <p className="text-xs md:text-sm text-ink/60 mt-2 leading-relaxed font-sans">
-                      <span className="text-ink/80 font-medium bg-sand/20 px-1 py-0.5 mr-1 font-mono text-[11px] uppercase tracking-wider">心理學機制</span> 
+                    <p className="text-xs md:text-sm text-ink/60 mt-2 leading-relaxed font-sans zodiac-desc">
+                      <span className="text-ink/80 font-medium bg-sand/20 px-1 py-0.5 mr-1 font-mono text-[11px] uppercase tracking-wider zodiac-desc">心理學機制</span> 
                       {topic.reason}
                     </p>
                   </div>
@@ -465,8 +442,9 @@ export default function App() {
             </div>
 
             {/* 現場高難度急救台詞 */}
+            {/* 💡 所有標籤與描述也應該變成藍色 */}
             <div className="mb-10">
-              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">⚡ 現場高難度急救台詞 Emergency</h3>
+              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3 zodiac-desc">⚡ 現場高難度急救台詞 Emergency</h3>
               <div className="bg-ink text-cream p-6 md:p-8 text-center relative shadow-sm">
                 <p className="font-serif text-lg md:text-xl italic tracking-wide leading-relaxed">
                   “{analysisResult.rescueLine}”
@@ -475,9 +453,10 @@ export default function App() {
             </div>
 
             {/* 地獄雷區 */}
+            {/* 💡 所有標籤與描述也應該變成藍色 */}
             <div>
-              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">❌ 絕對禁忌地獄雷區 No-Go Zone</h3>
-              <p className="text-xs md:text-sm text-red-900 bg-red-50/30 border border-red-200/40 p-4 leading-relaxed font-sans">
+              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3 zodiac-desc">❌ 絕對禁忌地獄雷區 No-Go Zone</h3>
+              <p className="text-xs md:text-sm text-red-red leading-relaxed font-sans zodiac-desc">
                 {analysisResult.forbidden}
               </p>
             </div>
@@ -485,6 +464,8 @@ export default function App() {
         </main>
       )}
 
+      {/* 底部線條與雅致刻印 */}
+      {/* 💡 底部線條也是藍色 */}
       <footer className="max-w-6xl mx-auto px-6 py-12 border-t border-sand/60 text-[9px] font-mono uppercase tracking-[0.2em] text-ink/30 flex justify-between">
         <span>GOOD SIGN CO. ALL RIGHTS RESERVED.</span>
         <span>ATREUS PROTOCOL MATRIX 2026</span>
