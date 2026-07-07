@@ -1,6 +1,6 @@
 // src/App.jsx
 
-import { useState, useRef, useEffect } from 'react' // 💡 加入 useEffect 來監聽滑鼠
+import { useState, useRef, useEffect } from 'react'
 import {
   ZODIACS,
   MBTIS,
@@ -11,9 +11,8 @@ import {
   generateComprehensiveAnalysis,
 } from './data'
 
-// 十七世紀銅雕星圖風格的內聯高精度向量 SVG 組件
+// 十七世紀銅板星圖風格寫實神話人像 SVG 組件
 function VintageZodiacIcon({ id, active }) {
-  // 對應星座的 SVG 路徑代碼
   const getDeityPath = (zId) => {
     switch (zId) {
       case 'aries': return "M25,55 Q35,35 55,38 Q65,40 75,32 Q82,25 78,42 Q74,55 60,60 Q45,62 30,70";
@@ -36,7 +35,6 @@ function VintageZodiacIcon({ id, active }) {
   
   return (
     <svg viewBox="0 0 100 100" className="w-16 h-16 transition-all duration-700">
-      {/* 使用用戶提供的古星圖作為寫實人像的 SVG 原始碼 */}
       <path
         d={getDeityPath(id)}
         stroke={strokeColor}
@@ -44,20 +42,19 @@ function VintageZodiacIcon({ id, active }) {
         strokeLinecap="round"
         fill="none"
       />
-      {/* */}
     </svg>
   );
 }
 
 export default function App() {
-  // 輸入狀態管理，精簡移除自我輸入
+  // 輸入狀態管理
   const [targetZodiac, setTargetZodiac] = useState('')
   const [targetMbti, setTargetMbti] = useState('')
   const [purpose, setPurpose] = useState('')
   const [environment, setEnvironment] = useState('')
   const [energy, setEnergy] = useState('')
 
-  // 截圖上傳與波形掃描狀態
+  // 截圖上傳狀態
   const [dragOver, setDragOver] = useState(false)
   const [imagePreview, setImagePreview] = useState(null)
   const [scanning, setScanning] = useState(false)
@@ -68,10 +65,10 @@ export default function App() {
   const [currentView, setCurrentView] = useState('input') // 'input' | 'result'
   const [analysisResult, setAnalysisResult] = useState(null)
 
-  // 💡 用於動態 Hover 特效的 Ref
+  // 用於動態 Hover 特效的標題 Ref
   const titleRef = useRef(null);
 
-  // 💡 使用 useEffect 監聽巨大標題的滑鼠移動，計算並傳遞 X, Y 座標
+  // 監聽巨大標題的滑鼠移動，動態計算並傳遞局部 X, Y 座標
   useEffect(() => {
     const titleElement = titleRef.current;
     if (!titleElement) return;
@@ -80,20 +77,16 @@ export default function App() {
       const rect = titleElement.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 100 + '%';
       const y = ((e.clientY - rect.top) / rect.height) * 100 + '%';
-      // 將計算好的滑鼠位置（百分比）傳遞給 CSS 變量 --x 和 --y
       titleElement.style.setProperty('--x', x);
       titleElement.style.setProperty('--y', y);
     };
 
     titleElement.addEventListener('mousemove', handleMouseMove);
-
-    // 關閉網頁時移除監聽，防止記憶體洩漏
     return () => {
       titleElement.removeEventListener('mousemove', handleMouseMove);
     };
-  }, []); // 僅在元件載入時執行一次
+  }, []);
 
-  // 驗證邏輯：星座與 MBTI 二擇一，情境必填即可解鎖按鈕
   const isIdentityProvided = targetZodiac || targetMbti;
   const isContextProvided = purpose && environment && energy;
   const canSubmit = isIdentityProvided && isContextProvided;
@@ -129,34 +122,66 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-cream text-ink antialiased font-sans selection:bg-ink selection:text-cream">
-      {/* 頂部古典字體巨大版頭 (完全符合 Athens-26 策展風) */}
-      <header className="max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-12 border-b border-sand/60">
+      
+      {/* 💡 內嵌封裝 CSS：確保銀色雕刻探照燈特效完美運作且不衝突 */}
+      <style>{`
+        #good-sign-title {
+          color: #2C2A29;
+          font-family: 'Playfair Display', Georgia, serif;
+          transition: color 0.3s ease;
+        }
+        @media (min-width: 768px) {
+          #good-sign-title.dynamic-engraved-hover:hover {
+            color: transparent;
+            background-image: linear-gradient(135deg, #7e7e7e 0%, #d6d3d1 25%, #ffffff 50%, #d6d3d1 75%, #7e7e7e 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            filter: drop-shadow(1px 2px 4px rgba(44,42,41,0.15));
+            
+            /* 探照燈遮罩效果：只在滑鼠周圍 200px 內顯現銀色金屬雕刻質感 */
+            -webkit-mask-image: radial-gradient(
+              circle 200px at var(--x, 50%) var(--y, 50%),
+              black 0%,
+              rgba(0,0,0,0.7) 50%,
+              transparent 100%
+            );
+            mask-image: radial-gradient(
+              circle 200px at var(--x, 50%) var(--y, 50%),
+              black 0%,
+              rgba(0,0,0,0.7) 50%,
+              transparent 100%
+            );
+          }
+        }
+      `}</style>
+
+      {/* 頂部高級網格版頭 */}
+      <header className="max-w-7xl mx-auto px-6 pt-16 md:pt-24 pb-12 border-b border-sand/60 text-center">
         <div className="flex items-center justify-between text-[11px] tracking-[0.25em] uppercase text-ink/40 font-mono mb-8">
           <span>A.26 — CELESTIAL ALIGNMENT</span>
           <span>FIELD EMISSION — VERSION 2.0</span>
         </div>
-        <div className="text-center">
-          {/* 💡 核心修改 1：設定巨大標題的 Ref 和動態 Hover Class */}
-          <h1
-            ref={titleRef}
-            id="good-sign-title"
-            className="font-serif text-[14rem] leading-none font-bold text-ink select-none uppercase dynamic-engraved-hover w-full block my-8"
-          >
-            GOOD SIGN
-          </h1>
-          
-          <p className="text-xs md:text-sm text-ink/60 max-w-3xl mx-auto leading-relaxed font-sans pt-6 border-t border-sand/80">
-            傾聽古典黃道天體與當代人格科學的交織回響。
-            我們摒棄冗餘的自身數據，專注於剖析目標對象隱匿於聊天對話框與物理環境背後的真實波長，
-            為跨越虛擬與實體的靈魂，策展出一份具備極高心理學共情厚度的見面指南。
-          </p>
-        </div>
+        
+        {/* 修正 1：巨幅單字設計，移除 - 與 .，並掛載滑鼠座標監聽 */}
+        <h1
+          ref={titleRef}
+          id="good-sign-title"
+          className="text-6xl sm:text-8xl md:text-[11rem] lg:text-[14rem] font-bold tracking-normal select-none leading-none uppercase w-full block my-8 dynamic-engraved-hover cursor-crosshair"
+        >
+          GOOD SIGN
+        </h1>
+        
+        <p className="text-xs md:text-sm text-ink/60 max-w-3xl mx-auto leading-relaxed font-sans mt-8 pt-6 border-t border-sand/40">
+          傾聽古典黃道天體與當代人格科學的交織回響。
+          我們摒棄冗餘的自身數據，專注於剖析目標對象隱匿於聊天對話框與物理環境背後的真實波長，
+          為跨越虛擬與實體的靈魂，策展出一份具備極高心理學共情厚度的見面指南。
+        </p>
       </header>
 
       {/* 視圖切換邏輯：第一頁（輸入表單頁） */}
       {currentView === 'input' && (
         <main className="max-w-6xl mx-auto px-6 pb-36 animate-fadeIn">
-          {/* 區塊 A：神話星座浮雕 */}
+          {/* 區塊 I：神話星座古星圖寫實線條 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">I.</span>
@@ -164,7 +189,7 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 mt-1 font-mono">Zodiac Pantheons (Pick One)</p>
             </div>
             <div className="lg:col-span-9">
-              {/* 用戶提供的古星圖風格寫實神話圖標 */}
+              {/* 修正 2：12星座全面換成具備十七世紀星圖生命力的寫實線條 */}
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {ZODIACS.map((z) => {
                   const isSelected = targetZodiac === z.id;
@@ -179,10 +204,9 @@ export default function App() {
                           : 'bg-transparent text-ink border-sand hover:border-ink/60'
                       }`}
                     >
-                      {/* 仿製 Athens 2026 照片中大理石與水銀流體般的立體金屬 hover 特效層 */}
                       <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/20 to-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none mix-blend-overlay" />
                       
-                      <div className="mb-2 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-2">
+                      <div className="mb-2 transition-transform duration-700 group-hover:scale-110">
                         <VintageZodiacIcon id={z.id} active={isSelected} />
                       </div>
                       
@@ -227,7 +251,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* 區塊 B：MBTI */}
+          {/* 區塊 II：MBTI 獨立大項 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">II.</span>
@@ -235,6 +259,10 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 mt-1 font-mono">MBTI Core Type (Optional)</p>
             </div>
             <div className="lg:col-span-9">
+              <p className="text-xs md:text-sm text-ink/50 max-w-xl leading-relaxed mb-6">
+                MBTI 欄位在此系統中為<span className="text-ink border-b border-ink/40 pb-0.5 mx-1 font-medium">非必填項目</span>。
+                若對方的內心矩陣尚未對你解鎖，本指南將純粹依據星象黃道進行座標定位。
+              </p>
               <div className="relative border-b border-sand focus-within:border-ink max-w-xs transition-colors">
                 <select
                   value={targetMbti}
@@ -251,7 +279,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* 區塊 C：場景控制項 */}
+          {/* 區塊 III：場景控制項 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">III.</span>
@@ -315,7 +343,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* 區塊 D：截圖上傳 */}
+          {/* 區塊 IV：截圖上傳 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">IV.</span>
@@ -354,13 +382,13 @@ export default function App() {
             </div>
           </section>
 
-          {/* 💡 核心修改 2：將按鈕文字更新為繁體中文「靈魂分析」並加入對應的 class */}
+          {/* 修正 3：按鈕文字更換為「靈魂分析」 */}
           <div className="pt-16 flex flex-col items-center">
             <button
               type="button"
               disabled={!canSubmit}
               onClick={executeAnalysis}
-              className={`px-16 py-4 font-serif text-lg tracking-widest border transition-all duration-500 cta-soul-analysis ${
+              className={`px-16 py-4 font-serif text-lg tracking-widest border transition-all duration-500 ${
                 canSubmit
                   ? 'bg-ink text-cream border-ink hover:opacity-90 shadow-md'
                   : 'bg-transparent text-ink/20 border-sand cursor-not-allowed'
@@ -377,7 +405,7 @@ export default function App() {
         </main>
       )}
 
-      {/* 視圖切換邏輯：第二頁 */}
+      {/* 視圖切換邏輯：第二頁（獨立分析結果報告書頁面） */}
       {currentView === 'result' && analysisResult && (
         <main className="max-w-4xl mx-auto px-6 pb-36 pt-12 animate-fadeIn">
           <button
@@ -410,6 +438,7 @@ export default function App() {
               </div>
             </div>
 
+            {/* 大方向評估：完美保持大字體有襯線體 */}
             <div className="mb-10">
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">📍 氣場大方向評估 Assessment</h3>
               <p className="font-serif text-xl md:text-2xl text-ink/80 leading-relaxed bg-cream p-6 border border-sand/40 font-normal">
@@ -417,6 +446,7 @@ export default function App() {
               </p>
             </div>
 
+            {/* 核心修正：移除會阻礙編譯的系統註解，確保 map 100% 渲染流暢 */}
             <div className="mb-10">
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-4">💬 深度客製化破冰提案 Icebreakers</h3>
               <div className="space-y-6">
@@ -434,6 +464,7 @@ export default function App() {
               </div>
             </div>
 
+            {/* 現場高難度急救台詞 */}
             <div className="mb-10">
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">⚡ 現場高難度急救台詞 Emergency</h3>
               <div className="bg-ink text-cream p-6 md:p-8 text-center relative shadow-sm">
@@ -443,6 +474,7 @@ export default function App() {
               </div>
             </div>
 
+            {/* 地獄雷區 */}
             <div>
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">❌ 絕對禁忌地獄雷區 No-Go Zone</h3>
               <p className="text-xs md:text-sm text-red-900 bg-red-50/30 border border-red-200/40 p-4 leading-relaxed font-sans">
