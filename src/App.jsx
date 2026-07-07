@@ -76,7 +76,7 @@ function VintageZodiacIcon({ id, active }) {
           <circle cx="50" cy="50" r="42" stroke={strokeColor} strokeWidth="1" fill="none" />
           <path d="M50,25 L50,70 M25,35 L75,35 M30,35 L30,55 M70,35 L70,55" stroke={strokeColor} strokeWidth="1.5" strokeLinecap="round" fill="none" />
           <path d="M20,55 Q30,55 30,55 Q40,55 40,55 M60,55 Q70,55 70,55 Q80,55 80,55" stroke={strokeColor} strokeWidth="1.5" fill="none" />
-          <path d="M20,55 C20,62 40,62 40,55 M60,55 C60,62 80,62 80,55" stroke={strokeColor} strokeWidth="1" fill="none" />
+          <path d="M20,55 C20,62 40,62 40,55 M60,55 C60,62 80,62 80,55" stroke={strokeColor} strokeWidth="1.5" fill="none" />
           <circle cx="50" cy="25" r="2" fill={strokeColor} />
         </svg>
       );
@@ -114,7 +114,7 @@ function VintageZodiacIcon({ id, active }) {
           <circle cx="50" cy="50" r="42" stroke={strokeColor} strokeWidth="1" fill="none" />
           <path d="M42,30 L58,30 M40,40 L60,40 M35,55 C35,70 65,70 65,55 L60,40 L40,40 Z" stroke={strokeColor} strokeWidth="1.5" strokeLinejoin="round" fill="none" />
           <path d="M35,45 Q25,50 35,55 M65,45 Q75,50 65,55" stroke={strokeColor} strokeWidth="1" fill="none" />
-          <path d="M50,65 Q50,85 35,82 M48,65 Q45,85 30,80" stroke={strokeColor} strokeWidth="1" strokeLinecap="round" fill="none" />
+          <path d="M50,65 Q50,85 35,82 M48,65 Q45,85 30,80" stroke={strokeColor} strokeWidth="1.5" strokeLinecap="round" fill="none" />
         </svg>
       );
     case 'pisces': // 雙魚：朝相反方向游動的兩條古風圖騰魚，中間以雙線絲帶相連
@@ -122,7 +122,7 @@ function VintageZodiacIcon({ id, active }) {
         <svg viewBox="0 0 100 100" className="w-16 h-16 transition-all duration-700">
           <circle cx="50" cy="50" r="42" stroke={strokeColor} strokeWidth="1" fill="none" />
           <path d="M25,40 C45,30 45,50 25,40 Z M75,60 C55,50 55,70 75,60 Z" stroke={strokeColor} strokeWidth="1.5" fill="none" />
-          <path d="M35,42 Q50,50 65,58" stroke={strokeColor} strokeWidth="1" strokeDasharray="2 2" fill="none" />
+          <path d="M35,42 Q50,50 65,58" stroke={strokeColor} strokeWidth="1.2" strokeDasharray="2 2" fill="none" />
           <circle cx="28" cy="38" r="1" fill={strokeColor} /><circle cx="72" cy="58" r="1" fill={strokeColor} />
         </svg>
       );
@@ -208,7 +208,7 @@ export default function App() {
       {/* 視圖切換邏輯：第一頁（輸入表單頁） */}
       {currentView === 'input' && (
         <main className="max-w-6xl mx-auto px-6 pb-36 animate-fadeIn">
-          {/* 區塊 A：神話星座浮雕 */}
+          {/* 區塊 I：神話星座浮雕 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">I.</span>
@@ -258,15 +258,15 @@ export default function App() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-xs md:text-sm leading-relaxed text-ink/70">
                     <div>
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">愛慾與浪漫 Aphrodite's Touch</span>
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">愛慾與浪漫 Aphrodite'Touch</span>
                       <p>追求純粹與對等。極度看重交流中的回饋頻率，一旦察覺失衡便會優雅收回情感。</p>
                     </div>
                     <div>
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">神殿事業/修煉 Athena's Shield</span>
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">神殿事業/修煉 Athena'Shield</span>
                       <p>具備克制的防禦機制，在緊要關頭傾向用冷靜且客觀的思維重新校準方向。</p>
                     </div>
                     <div>
-                      <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">凡間社交/家庭 Hestia's Hearth</span>
+                      <span className="text-[10px] font-mono uppercase tracking-widest text-ink/40 block mb-1">凡間社交/家庭 Hestia'Hearth</span>
                       <p>私底下對待認可的親密圈子帶有溫柔的反差，往往用隱忍來維持群體的和諧。</p>
                     </div>
                     <div>
@@ -279,7 +279,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* 區塊 B：MBTI 獨立大項（明確標註非必填） */}
+          {/* 區塊 II：MBTI 獨立大項（明確標註非必填） */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">II.</span>
@@ -308,7 +308,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* 區塊 C：場景控制項 */}
+          {/* 區塊 III：場景控制項 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">III.</span>
@@ -372,7 +372,7 @@ export default function App() {
             </div>
           </section>
 
-          {/* 區塊 D：截圖上傳 */}
+          {/* 區塊 IV：截圖上傳 */}
           <section className="py-14 border-b border-sand/60 grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div className="lg:col-span-3">
               <span className="font-serif text-3xl text-ink/30 font-semibold tracking-wider">IV.</span>
@@ -471,19 +471,21 @@ export default function App() {
               </div>
             </div>
 
-            {/* 1. 宏觀大方向分析 (ChatGPT 溫暖諮商文風) */}
+            {/* 📍 1. 大方向評估 — 放大並改成有襯線體 */}
             <div className="mb-10">
-              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">📍 氣場大方向評估 Assessment</h3>
-              <p className="text-base text-ink/80 leading-relaxed font-sans bg-cream p-6 border border-sand/40 font-normal">
-                {analysisResult.macroAssessment}
+              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">📍 氣場大方向評估Assessment</h3>
+              {/* 核心修改：移除 text-base, font-sans, font-normal；加入 font-serif, text-xl, md:text-2xl, font-normal */}
+              <p className="font-serif text-xl md:text-2xl text-ink/80 leading-relaxed bg-cream p-6 border border-sand/40 font-normal">
+                {analysisResult.macroAssessment} {/* */}
               </p>
             </div>
 
-            {/* 2. 深度話題與背後心理學剖析 */}
+            {/* 💬 2. 深度話題與背後心理學剖析 */}
             <div className="mb-10">
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-4">💬 深度客製化破冰提案 Icebreakers</h3>
               <div className="space-y-6">
                 {analysisResult.topics.map((topic, idx) => (
+                    //
                   <div key={idx} className="border-l border-ink/40 pl-5 py-1">
                     <h4 className="font-serif text-lg text-ink font-medium">
                       {idx + 1}. {topic.title}
@@ -497,7 +499,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* 3. 現場高難度急救台詞 */}
+            {/* ⚡ 3. 現場高難度急救台詞 */}
             <div className="mb-10">
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">⚡ 現場高難度急救台詞 Emergency</h3>
               <div className="bg-ink text-cream p-6 md:p-8 text-center relative shadow-sm">
@@ -507,7 +509,7 @@ export default function App() {
               </div>
             </div>
 
-            {/* 4. 地獄雷區 */}
+            {/* ❌ 4. 地獄雷區 */}
             <div>
               <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-3">❌ 絕對禁忌地獄雷區 No-Go Zone</h3>
               <p className="text-xs md:text-sm text-red-900 bg-red-50/30 border border-red-200/40 p-4 leading-relaxed font-sans">
