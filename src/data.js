@@ -195,6 +195,72 @@ export function generateComprehensiveAnalysis({ zodiac, mbti, purpose, environme
   };
 }
 
+// --- 塔羅話題牌組 (Tarot Topic Deck) ---
+// A shared pool of icebreaker topics, each tagged with the meeting purposes it suits best
+// and the zodiac elements it resonates with. generateTopicDeck() scores every topic against
+// the current target + context and returns at least 20 cards sorted by recommendation score.
+const TOPIC_POOL = [
+  { title: '最著迷的一種感官細節', reason: '談論具體而微的感官記憶（氣味、聲音、觸感），能溫柔繞過表面寒暄，直接觸動潛意識裡柔軟的情感連結。', tags: ['romantic', 'friend'], elements: ['water', 'air'] },
+  { title: '一個只有極少數人知道的私房怪癖', reason: '主動暴露一個無傷大雅的反差特徵，能迅速建立心理安全感，促使對方也樂意展示真實的自己。', tags: ['romantic', 'friend'], elements: ['fire', 'water'] },
+  { title: '如果一整天不被打擾，最想待在哪個角落', reason: '這題能優雅探知對方的私密審美，讓緊繃的初次會面轉化為一場無壓力的腦內漫遊。', tags: ['romantic'], elements: ['water', 'earth'] },
+  { title: '目前領域裡最讓你興奮的一項未來變革', reason: '拋出具備前瞻視野的議題，能在一秒內建立你在對方心中的專業分量與談話價值。', tags: ['work'], elements: ['fire', 'air'] },
+  { title: '職涯裡印象最深的一段轉折或低谷', reason: '坦誠聊聊有養分的失敗，展現自我覺察力與心理韌性，容易讓重視誠實特質的人產生信任感。', tags: ['work'], elements: ['earth'] },
+  { title: '興趣領域裡讓你廢寢忘食的一個考據', reason: '直接切入最硬核、最有熱情的特定領域，能瞬間點燃分享欲，讓對話能量密度拉滿。', tags: ['friend'], elements: ['air', 'fire'] },
+  { title: '線上線下反差最大的一個特質', reason: '用線上線下的落差當切入點，能巧妙消解虛擬感帶來的隔閡，是安全又幽默的人際橋樑。', tags: ['friend', 'forced'], elements: ['air'] },
+  { title: '介紹人到底跟你說了對方什麼', reason: '直球拆穿這種場合的尷尬本質，反而能讓雙方一起笑出來，瞬間卸下防備心。', tags: ['forced'], elements: ['fire', 'air'] },
+  { title: '這輩子做過最衝動但不後悔的決定', reason: '衝動決定往往藏著一個人最真實的價值排序，是快速認識對方底層性格的捷徑。', tags: ['romantic', 'friend'], elements: ['fire'] },
+  { title: '心目中最理想的一天怎麼度過', reason: '這是一道零風險又能看出生活步調與價值觀的萬用題，幾乎適合任何場合。', tags: ['romantic', 'work', 'friend', 'forced'], elements: ['earth', 'water'] },
+  { title: '最近一次被小事情感動的瞬間', reason: '情感類話題能快速拉近距離，尤其對情感豐沛的對象特別有效，容易聊出真心話。', tags: ['romantic'], elements: ['water'] },
+  { title: '如果有一筆意外之財，第一件事想做什麼', reason: '金錢假設題能有趣地揭露對方的優先順序與冒險傾向，且輕鬆不冒犯。', tags: ['friend', 'forced'], elements: ['fire', 'earth'] },
+  { title: '小時候印象最深的一段回憶', reason: '童年話題天生自帶柔軟濾鏡，能讓對話從社交模式切換到更真誠的頻道。', tags: ['romantic', 'friend'], elements: ['water', 'earth'] },
+  { title: '最近有沒有學到讓你很有感的小道理', reason: '這題能自然展現對方的思考深度，也給彼此一個交換價值觀的安全窗口。', tags: ['work', 'friend'], elements: ['air', 'earth'] },
+  { title: '一首能代表你最近心情的歌', reason: '音樂是最低成本的自我揭露，用歌曲當媒介比直接問「你最近好嗎」更有記憶點。', tags: ['romantic', 'friend'], elements: ['air', 'water'] },
+  { title: '最近讓你上頭到停不下來的一件小事', reason: '這題輕鬆、無壓力，卻能意外挖出對方最近真正投入熱情的地方。', tags: ['friend', 'forced'], elements: ['fire', 'air'] },
+  { title: '如果可以跟歷史上任何人吃一頓飯，會選誰', reason: '想像題能側面看出對方欣賞的特質與價值取向，是很好的深度切入口。', tags: ['work', 'friend'], elements: ['fire', 'air'] },
+  { title: '對「穩定」這兩個字的定義是什麼', reason: '這是溫和探詢對方人生階段與需求的方式，尤其適合帶點認真意圖的場合。', tags: ['romantic', 'work'], elements: ['earth'] },
+  { title: '最近一次為了誰而熬夜做的事', reason: '熬夜背後往往藏著一個人真正在意的關係，是不著痕跡打探重要性排序的好問題。', tags: ['romantic', 'friend'], elements: ['water', 'fire'] },
+  { title: '一個你正在努力戒掉或養成的習慣', reason: '自我成長話題展現真誠與自省，也給對方一個分享自身掙扎的安全空間。', tags: ['work', 'forced'], elements: ['earth'] },
+  { title: '最近一次讓你笑到不行的迷因或梗', reason: '幽默感是最快的破冰武器，共同笑點能瞬間拉近陌生感。', tags: ['friend', 'forced'], elements: ['air', 'fire'] },
+  { title: '如果可以立刻精通一項技能，會選什麼', reason: '這題能看出對方當下最渴望的能力缺口，也常常意外聊出深層的不安全感或嚮往。', tags: ['work', 'friend'], elements: ['fire', 'air'] },
+  { title: '今天這個場合，你最想被問到的問題', reason: '把主導權交回給對方，直接展現體貼與自信，通常會得到意想不到的真心話。', tags: ['romantic', 'work', 'friend', 'forced'], elements: ['water', 'air'] },
+  { title: '最近一次夢到印象深刻的夢', reason: '夢境話題自帶超現實趣味，很適合用來打破過度理性、公式化的對話節奏。', tags: ['romantic', 'friend'], elements: ['water'] },
+]
+
+function seedFromString(str) {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash * 31 + str.charCodeAt(i)) >>> 0
+  }
+  return hash
+}
+
+function mulberry32(seed) {
+  let a = seed
+  return function () {
+    a |= 0
+    a = (a + 0x6d2b79f5) | 0
+    let t = Math.imul(a ^ (a >>> 15), 1 | a)
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
+  }
+}
+
+export function generateTopicDeck({ zodiac, mbti, purpose, energy }) {
+  const zInfo = ZODIACS.find((z) => z.id === zodiac)
+  const element = zInfo?.element
+
+  return TOPIC_POOL.map((topic, idx) => {
+    const rng = mulberry32(seedFromString(`${topic.title}-${zodiac}-${mbti}-${purpose}-${energy}-${idx}`))
+    let score = 58
+    if (purpose && topic.tags.includes(purpose)) score += 16
+    if (element && topic.elements.includes(element)) score += 12
+    if (mbti && mbti[0] === 'E') score += 3
+    score += Math.floor(rng() * 14)
+    score = Math.max(42, Math.min(98, score))
+    return { id: idx, title: topic.title, reason: topic.reason, score }
+  }).sort((a, b) => b.score - a.score)
+}
+
 export function analyzeScreenshot(file) {
   let hash = 0;
   const name = file ? file.name : 'signal';

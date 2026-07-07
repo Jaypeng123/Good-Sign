@@ -1,6 +1,8 @@
 // src/App.jsx
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import html2canvas from 'html2canvas'
 import {
   ZODIACS,
   MBTIS,
@@ -9,36 +11,10 @@ import {
   ENERGIES,
   analyzeScreenshot,
   generateComprehensiveAnalysis,
+  generateTopicDeck,
 } from './data'
 
 const SIGN_BLUE = '#1D4ED8'
-
-// Real deity photography slots in via `z.image` (see data.js) — until those assets are
-// supplied this renders the monochrome zodiac glyph instead, so the grid never looks broken.
-function VintageZodiacIcon({ z, active }) {
-  const [imgFailed, setImgFailed] = useState(false)
-  const showImage = z.image && !imgFailed
-
-  if (showImage) {
-    return (
-      <img
-        src={z.image}
-        alt={z.label}
-        onError={() => setImgFailed(true)}
-        className="w-16 h-16 object-cover rounded-full shadow-[inset_2px_2px_4px_rgba(255,255,255,0.6),inset_-2px_-2px_6px_rgba(29,78,216,0.2)]"
-      />
-    )
-  }
-
-  return (
-    <span
-      className="block w-16 h-16 leading-[4rem] text-center font-serif text-4xl transition-all duration-700"
-      style={{ color: active ? '#F6F3ED' : SIGN_BLUE }}
-    >
-      {z.symbol}
-    </span>
-  )
-}
 
 function StarField() {
   return (
@@ -60,6 +36,109 @@ function CornerMarks() {
       <span className="absolute -bottom-1.5 -left-1.5 text-[#1D4ED8]/50 text-sm leading-none select-none">+</span>
       <span className="absolute -bottom-1.5 -right-1.5 text-[#1D4ED8]/50 text-sm leading-none select-none">+</span>
     </>
+  )
+}
+
+// 12 nodes placed around a circle like an actual zodiac wheel/star-chart instead of a rigid grid.
+function ZodiacWheel({ value, onChange }) {
+  const selected = ZODIACS.find((z) => z.id === value)
+  const radius = 42
+
+  return (
+    <div className="relative w-full max-w-2xl mx-auto aspect-square select-none">
+      {/* slowly rotating decorative bezel, like a zodiac clock face */}
+      <svg className="absolute inset-0 w-full h-full animate-[spin_90s_linear_infinite] pointer-events-none" viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="47" fill="none" stroke="#1D4ED8" strokeOpacity="0.15" strokeWidth="0.5" strokeDasharray="1 3" />
+        <circle cx="50" cy="50" r="38" fill="none" stroke="#1D4ED8" strokeOpacity="0.1" strokeWidth="0.3" />
+      </svg>
+
+      {/* faint spokes connecting each sign to the centre */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100">
+        {ZODIACS.map((z, i) => {
+          const angle = (i * 30 - 90) * (Math.PI / 180)
+          const x = 50 + radius * Math.cos(angle)
+          const y = 50 + radius * Math.sin(angle)
+          return (
+            <line
+              key={z.id}
+              x1="50"
+              y1="50"
+              x2={x}
+              y2={y}
+              stroke="#1D4ED8"
+              strokeOpacity={value === z.id ? 0.35 : 0.08}
+              strokeWidth="0.3"
+            />
+          )
+        })}
+      </svg>
+
+      {/* centre medallion */}
+      <div className="absolute inset-[30%] rounded-full border border-ink/15 bg-cream/80 backdrop-blur-sm flex flex-col items-center justify-center text-center px-2 shadow-[inset_2px_2px_6px_rgba(255,255,255,0.7),inset_-3px_-3px_10px_rgba(29,78,216,0.08)]">
+        {selected ? (
+          <>
+            <span className="text-3xl sm:text-4xl font-serif text-[#1D4ED8]">{selected.symbol}</span>
+            <span className="text-xs sm:text-sm font-serif text-ink mt-1">{selected.label}</span>
+          </>
+        ) : (
+          <span className="text-[10px] uppercase tracking-widest text-ink/40 font-mono leading-tight">選擇你的<br />目標星象</span>
+        )}
+      </div>
+
+      {ZODIACS.map((z, i) => {
+        const angle = (i * 30 - 90) * (Math.PI / 180)
+        const x = 50 + radius * Math.cos(angle)
+        const y = 50 + radius * Math.sin(angle)
+        const isSelected = value === z.id
+        const isAquarius = z.id === 'aquarius'
+        const baseRotate = i % 2 === 0 ? -4 : 4
+
+        return (
+          <motion.button
+            key={z.id}
+            type="button"
+            onClick={() => onChange(isSelected ? '' : z.id)}
+            initial={{ opacity: 0, scale: 0.4 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ delay: i * 0.04, type: 'spring', stiffness: 220, damping: 16 }}
+            whileHover={{ scale: 1.18, rotate: 0, y: -4 }}
+            whileTap={{ scale: 0.95 }}
+            style={{ left: `${x}%`, top: `${y}%`, rotate: baseRotate }}
+            className="group absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center gap-1.5"
+          >
+            <span
+              className={`w-[clamp(44px,9vw,72px)] h-[clamp(44px,9vw,72px)] aspect-square rounded-full border flex items-center justify-center relative overflow-hidden shrink-0 ${
+                isSelected
+                  ? 'bg-[#1D4ED8] border-[#1D4ED8] shadow-[0_12px_28px_-8px_rgba(29,78,216,0.5)]'
+                  : 'bg-cream border-[#1D4ED8]/25 group-hover:border-[#1D4ED8] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.7),inset_-2px_-2px_6px_rgba(29,78,216,0.1)]'
+              }`}
+            >
+              {/* shimmer sweep */}
+              <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+              <span
+                className="font-serif text-xl sm:text-2xl leading-none"
+                style={{ color: isSelected ? '#F6F3ED' : SIGN_BLUE }}
+              >
+                {z.symbol}
+              </span>
+              {isAquarius && (
+                <motion.span
+                  aria-hidden
+                  className="absolute -bottom-1 text-[10px]"
+                  initial={{ opacity: 0, y: -4 }}
+                  whileHover={{ opacity: [0, 1, 0], y: [0, 10, 16] }}
+                  transition={{ duration: 0.9, repeat: Infinity }}
+                >
+                  💧
+                </motion.span>
+              )}
+            </span>
+            <span className="text-[9px] sm:text-[10px] tracking-wide font-serif text-ink whitespace-nowrap">{z.label}</span>
+          </motion.button>
+        )
+      })}
+    </div>
   )
 }
 
@@ -123,6 +202,91 @@ function Dropdown({ label, value, onChange, options, placeholder }) {
   )
 }
 
+function TarotCard({ card, index, total }) {
+  return (
+    <div className="relative w-full h-full rounded-2xl border-2 border-[#1D4ED8]/40 bg-cream p-6 sm:p-8 flex flex-col shadow-[0_20px_40px_-12px_rgba(29,78,216,0.25)] overflow-hidden">
+      <div className="absolute inset-2 rounded-xl border border-[#1D4ED8]/20 pointer-events-none" />
+      <div className="flex items-center justify-between mb-4">
+        <span className="font-mono text-xs text-ink/40 tracking-widest">No. {index + 1} / {total}</span>
+        <span className="font-serif text-2xl text-[#1D4ED8]">{card.score}%</span>
+      </div>
+      <h3 className="font-serif text-xl sm:text-2xl text-ink leading-snug mb-4">{card.title}</h3>
+      <p className="text-sm text-ink/60 leading-relaxed flex-1 overflow-y-auto">{card.reason}</p>
+      <div className="mt-4 text-center text-[#1D4ED8]/40 text-lg">✦</div>
+    </div>
+  )
+}
+
+function TarotCarousel({ cards }) {
+  const [index, setIndex] = useState(0)
+  const [direction, setDirection] = useState(1)
+
+  if (!cards.length) return null
+  const card = cards[index]
+
+  function go(delta) {
+    setDirection(delta)
+    setIndex((i) => (i + delta + cards.length) % cards.length)
+  }
+
+  return (
+    <div className="flex flex-col items-center">
+      <div className="relative w-full max-w-sm h-[380px] sm:h-[420px]">
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.div
+            key={card.id}
+            initial={{ x: direction > 0 ? 220 : -220, opacity: 0, rotate: direction > 0 ? 8 : -8 }}
+            animate={{ x: 0, opacity: 1, rotate: 0 }}
+            exit={{ x: direction > 0 ? -220 : 220, opacity: 0, rotate: direction > 0 ? -8 : 8 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+            drag="x"
+            dragConstraints={{ left: 0, right: 0 }}
+            dragElastic={0.6}
+            onDragEnd={(_e, info) => {
+              if (info.offset.x < -80) go(1)
+              else if (info.offset.x > 80) go(-1)
+            }}
+            className="absolute inset-0 cursor-grab active:cursor-grabbing"
+          >
+            <TarotCard card={card} index={index} total={cards.length} />
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="flex items-center gap-6 mt-6">
+        <button
+          type="button"
+          onClick={() => go(-1)}
+          className="w-10 h-10 rounded-full border border-ink/20 flex items-center justify-center hover:border-ink transition-colors text-lg"
+        >
+          ‹
+        </button>
+        <span className="text-xs font-mono text-ink/40 tracking-widest">{index + 1} / {cards.length}</span>
+        <button
+          type="button"
+          onClick={() => go(1)}
+          className="w-10 h-10 rounded-full border border-ink/20 flex items-center justify-center hover:border-ink transition-colors text-lg"
+        >
+          ›
+        </button>
+      </div>
+      <p className="mt-2 text-[10px] uppercase tracking-widest text-ink/30 font-mono sm:hidden">左右滑動切換話題卡</p>
+    </div>
+  )
+}
+
+function ShareCard({ innerRef, result }) {
+  return (
+    <div ref={innerRef} className="w-[360px] bg-cream border-2 border-[#1D4ED8] p-8 flex flex-col items-center text-center gap-3 rounded-2xl">
+      <span className="text-[10px] uppercase tracking-[0.3em] text-[#1D4ED8]/60 font-mono">GOOD SIGN — 遙測報告</span>
+      <h2 className="font-['Cinzel'] font-black text-3xl text-ink">{result.targetName}</h2>
+      <div className="font-serif text-6xl text-[#1D4ED8]">{result.survivalRate}%</div>
+      <p className="text-xs text-ink/60 leading-relaxed">{result.macroAssessment.slice(0, 70)}…</p>
+      <span className="text-[10px] uppercase tracking-widest text-ink/30 font-mono mt-2">good-sign-tau.vercel.app</span>
+    </div>
+  )
+}
+
 export default function App() {
   const [targetZodiac, setTargetZodiac] = useState('')
   const [targetMbti, setTargetMbti] = useState('')
@@ -138,6 +302,17 @@ export default function App() {
 
   const [currentView, setCurrentView] = useState('input')
   const [analysisResult, setAnalysisResult] = useState(null)
+  const [topicDeck, setTopicDeck] = useState([])
+
+  const [mouseCoord, setMouseCoord] = useState({ x: '50%', y: '50%' })
+  const [isTitleHovered, setIsTitleHovered] = useState(false)
+
+  const handleTitleMouseMove = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const x = ((e.clientX - rect.left) / rect.width) * 100 + '%'
+    const y = ((e.clientY - rect.top) / rect.height) * 100 + '%'
+    setMouseCoord({ x, y })
+  }
 
   const isIdentityProvided = targetZodiac || targetMbti;
   const isContextProvided = purpose && environment && energy;
@@ -166,8 +341,47 @@ export default function App() {
       screenshotScores: scores
     })
     setAnalysisResult(result)
+    setTopicDeck(generateTopicDeck({ zodiac: targetZodiac, mbti: targetMbti, purpose, energy }))
     window.scrollTo({ top: 0, behavior: 'smooth' })
     setCurrentView('result')
+  }
+
+  function returnHome() {
+    setCurrentView('input')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const shareCardRef = useRef(null)
+  const [shareCopied, setShareCopied] = useState(false)
+
+  async function handleShareLink() {
+    if (!analysisResult) return
+    const shareText = `我剛用 GOOD SIGN 分析了 ${analysisResult.targetName}，防冷場機率 ${analysisResult.survivalRate}%！`
+    const shareData = { title: 'GOOD SIGN', text: shareText, url: window.location.href }
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+        return
+      } catch {
+        // user cancelled or share failed — fall through to clipboard copy
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(`${shareText} ${shareData.url}`)
+      setShareCopied(true)
+      window.setTimeout(() => setShareCopied(false), 2000)
+    } catch {
+      // clipboard unavailable — nothing more we can do silently
+    }
+  }
+
+  async function handleDownloadImage() {
+    if (!shareCardRef.current) return
+    const canvas = await html2canvas(shareCardRef.current, { backgroundColor: '#F6F3ED', scale: 2 })
+    const link = document.createElement('a')
+    link.download = 'good-sign-result.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
   }
 
   const selectedZodiacData = ZODIACS.find(z => z.id === targetZodiac)
@@ -177,27 +391,53 @@ export default function App() {
       <StarField />
       {/* 頂部高級網格版頭 */}
       <header className="relative max-w-6xl mx-auto px-6 pt-16 md:pt-24 pb-12 border-b border-sand/60">
-        <div className="flex items-center justify-between text-[11px] tracking-[0.25em] uppercase text-ink/40 font-mono mb-8">
-          <span>A.26 — CELESTIAL ALIGNMENT</span>
-          <span>FIELD EMISSION — VERSION 2.0</span>
+        <div className="flex items-center justify-between mb-8">
+          <span className="text-[11px] tracking-[0.25em] uppercase text-ink/40 font-mono px-3 py-1.5 rounded-full bg-white/40 backdrop-blur-md border border-white/60 shadow-sm">
+            A.26 — CELESTIAL ALIGNMENT
+          </span>
+          <span className="text-[11px] tracking-[0.25em] uppercase text-ink/40 font-mono px-3 py-1.5 rounded-full bg-white/40 backdrop-blur-md border border-white/60 shadow-sm">
+            FIELD EMISSION — VERSION 2.0
+          </span>
         </div>
 
         <div className="flex flex-col items-center text-center select-none my-8">
-          <span className="text-[#1D4ED8]/50 text-lg mb-3">✦</span>
+          <span className="text-ink/40 text-lg mb-3">✦</span>
           <div className="flex items-center gap-4 w-full max-w-xs mb-6">
-            <span className="h-px flex-1 bg-[#1D4ED8]/30" />
-            <span className="w-1.5 h-1.5 rotate-45 bg-[#1D4ED8]/50" />
-            <span className="h-px flex-1 bg-[#1D4ED8]/30" />
+            <span className="h-px flex-1 bg-ink/25" />
+            <span className="w-1.5 h-1.5 rotate-45 bg-ink/40" />
+            <span className="h-px flex-1 bg-ink/25" />
           </div>
-          <h1
-            className="font-['Cinzel'] font-black text-5xl sm:text-7xl md:text-9xl tracking-[0.05em] leading-none text-[#1D4ED8] [transform:scaleY(1.18)] [transform-origin:bottom] drop-shadow-[0_2px_0_rgba(29,78,216,0.15)]"
+
+          <div
+            onMouseMove={handleTitleMouseMove}
+            onMouseEnter={() => setIsTitleHovered(true)}
+            onMouseLeave={() => setIsTitleHovered(false)}
+            className="relative w-full cursor-crosshair"
           >
-            GOOD SIGN.
-          </h1>
+            <h1 className="font-['Cinzel'] font-black text-5xl sm:text-7xl md:text-9xl tracking-[0.05em] leading-none text-ink [transform:scaleY(1.18)] [transform-origin:bottom] m-0">
+              GOOD SIGN.
+            </h1>
+            <h1
+              aria-hidden
+              className="absolute inset-0 font-['Cinzel'] font-black text-5xl sm:text-7xl md:text-9xl tracking-[0.05em] leading-none [transform:scaleY(1.18)] [transform-origin:bottom] m-0 pointer-events-none transition-opacity duration-300"
+              style={{
+                color: 'transparent',
+                backgroundImage: 'linear-gradient(135deg, #6b7280 0%, #c9a876 25%, #fffdf5 50%, #c9a876 75%, #6b7280 100%)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                opacity: isTitleHovered ? 1 : 0,
+                WebkitMaskImage: `radial-gradient(circle 220px at ${mouseCoord.x} ${mouseCoord.y}, black 0%, rgba(0,0,0,0.35) 60%, transparent 100%)`,
+                maskImage: `radial-gradient(circle 220px at ${mouseCoord.x} ${mouseCoord.y}, black 0%, rgba(0,0,0,0.35) 60%, transparent 100%)`,
+              }}
+            >
+              GOOD SIGN.
+            </h1>
+          </div>
+
           <div className="flex items-center gap-4 w-full max-w-xs mt-7">
-            <span className="h-px flex-1 bg-[#1D4ED8]/30" />
-            <span className="w-1.5 h-1.5 rotate-45 bg-[#1D4ED8]/50" />
-            <span className="h-px flex-1 bg-[#1D4ED8]/30" />
+            <span className="h-px flex-1 bg-ink/25" />
+            <span className="w-1.5 h-1.5 rotate-45 bg-ink/40" />
+            <span className="h-px flex-1 bg-ink/25" />
           </div>
         </div>
 
@@ -220,37 +460,7 @@ export default function App() {
               <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 mt-1 font-mono">Zodiac Pantheons (Pick One)</p>
             </div>
             <div className="lg:col-span-9">
-              {/* 💡 這裡將星座圖標外框變成藍色元件 ( strokeColor 已更新 ) */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                {ZODIACS.map((z) => {
-                  const isSelected = targetZodiac === z.id;
-                  return (
-                    <button
-                      key={z.id}
-                      type="button"
-                      onClick={() => setTargetZodiac(isSelected ? '' : z.id)}
-                      className={`group relative flex flex-col items-center p-6 border rounded-2xl transition-all duration-500 ease-out overflow-hidden ${
-                        isSelected
-                          ? 'bg-[#1D4ED8] text-cream border-[#1D4ED8] -translate-y-1 shadow-[0_16px_32px_-12px_rgba(29,78,216,0.45)]'
-                          : 'bg-cream text-ink border-[#1D4ED8]/20 hover:-translate-y-1 hover:border-[#1D4ED8] shadow-[inset_1px_1px_2px_rgba(255,255,255,0.7),inset_-3px_-3px_8px_rgba(29,78,216,0.1)]'
-                      }`}
-                    >
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/0 via-white/20 to-black/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none mix-blend-overlay" />
-                      {/* metallic shimmer sweep */}
-                      <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/30 to-transparent" />
-
-                      <div className="mb-2 transition-transform duration-700 group-hover:scale-110">
-                        <VintageZodiacIcon z={z} active={isSelected} />
-                      </div>
-
-                      <span className="font-serif text-base tracking-wide mt-2">{z.label}</span>
-                      <span className={`text-[9px] uppercase tracking-widest font-mono mt-1 ${isSelected ? 'text-cream/40' : 'text-ink/40'}`}>
-                        {z.god.split(' ')[0]}
-                      </span>
-                    </button>
-                  );
-                })}
-              </div>
+              <ZodiacWheel value={targetZodiac} onChange={setTargetZodiac} />
 
               {/* 側寫展開面板 */}
               {selectedZodiacData && (
@@ -437,10 +647,10 @@ export default function App() {
         <main className="max-w-4xl mx-auto px-6 pb-36 pt-12 animate-fadeIn">
           <button
             type="button"
-            onClick={() => setCurrentView('input')}
-            className="flex items-center gap-2 text-xs uppercase tracking-widest text-ink/50 hover:text-ink transition-colors font-mono mb-8 group"
+            onClick={returnHome}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-full border border-ink/25 text-xs uppercase tracking-widest text-ink hover:bg-ink hover:text-cream hover:border-ink transition-colors duration-300 font-mono mb-8 group"
           >
-            <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> 返回上一步修改條件
+            <span className="transition-transform duration-300 group-hover:-translate-x-1">←</span> 回到首頁重新測算
           </button>
 
           <div className="border border-sand p-8 md:p-12 bg-ink/[0.005] relative">
@@ -475,25 +685,6 @@ export default function App() {
               </p>
             </div>
 
-            {/* 深度話題庫 */}
-            {/* 💡 所有標籤與描述也應該變成藍色 */}
-            <div className="mb-10">
-              <h3 className="text-xs uppercase tracking-widest text-ink/40 font-mono mb-4 zodiac-desc">💬 深度客製化破冰提案 Icebreakers</h3>
-              <div className="space-y-6">
-                {analysisResult.topics.map((topic, idx) => (
-                  <div key={idx} className="border-l border-ink/40 pl-5 py-1">
-                    <h4 className="font-serif text-lg text-ink font-medium zodiac-desc">
-                      {idx + 1}. {topic.title}
-                    </h4>
-                    <p className="text-xs md:text-sm text-ink/60 mt-2 leading-relaxed font-sans zodiac-desc">
-                      <span className="text-ink/80 font-medium bg-sand/20 px-1 py-0.5 mr-1 font-mono text-[11px] uppercase tracking-wider zodiac-desc">心理學機制</span> 
-                      {topic.reason}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* 現場高難度急救台詞 */}
             {/* 💡 所有標籤與描述也應該變成藍色 */}
             <div className="mb-10">
@@ -512,6 +703,44 @@ export default function App() {
               <p className="text-xs md:text-sm text-red-600 leading-relaxed font-sans zodiac-desc">
                 {analysisResult.forbidden}
               </p>
+            </div>
+          </div>
+
+          {/* 塔羅話題牌組 */}
+          <div className="mt-16">
+            <div className="text-center mb-8">
+              <h3 className="font-serif text-2xl text-ink">破冰話題牌組</h3>
+              <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 font-mono mt-1">
+                {topicDeck.length} Icebreaker Cards — Swipe or Click to Browse
+              </p>
+            </div>
+            <TarotCarousel cards={topicDeck} />
+          </div>
+
+          {/* 分享區塊 */}
+          <div className="mt-20 border-t border-sand/60 pt-12 flex flex-col items-center">
+            <h3 className="font-serif text-2xl text-ink mb-1">分享這份報告</h3>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-ink/40 font-mono mb-8">Share Your Good Sign</p>
+
+            <div className="mb-8 shadow-[0_20px_50px_-15px_rgba(29,78,216,0.3)] rounded-2xl">
+              <ShareCard innerRef={shareCardRef} result={analysisResult} />
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-3">
+              <button
+                type="button"
+                onClick={handleShareLink}
+                className="px-6 py-3 rounded-full bg-ink text-cream text-sm font-mono tracking-wide hover:opacity-90 transition-opacity"
+              >
+                {shareCopied ? '已複製連結 ✓' : '分享連結'}
+              </button>
+              <button
+                type="button"
+                onClick={handleDownloadImage}
+                className="px-6 py-3 rounded-full border border-ink/30 text-ink text-sm font-mono tracking-wide hover:border-ink transition-colors"
+              >
+                下載分享圖（IG / FB 用）
+              </button>
             </div>
           </div>
         </main>
