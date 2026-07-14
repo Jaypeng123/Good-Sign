@@ -24,12 +24,29 @@ export default function AmbientBackground() {
         speed: Math.random() * 0.12 + 0.02,
         drift: (Math.random() - 0.5) * 0.06,
         alpha: Math.random() * 0.35 + 0.1,
+        sparkle: Math.random() < 0.16,
+        phase: Math.random() * Math.PI * 2,
       }))
     }
 
+    function drawStar(x, y, r) {
+      ctx.beginPath()
+      ctx.moveTo(x, y - r)
+      ctx.lineTo(x + r * 0.28, y - r * 0.28)
+      ctx.lineTo(x + r, y)
+      ctx.lineTo(x + r * 0.28, y + r * 0.28)
+      ctx.lineTo(x, y + r)
+      ctx.lineTo(x - r * 0.28, y + r * 0.28)
+      ctx.lineTo(x - r, y)
+      ctx.lineTo(x - r * 0.28, y - r * 0.28)
+      ctx.closePath()
+      ctx.fill()
+    }
+
+    let t = 0
     function tick() {
+      t += 0.02
       ctx.clearRect(0, 0, w, h)
-      ctx.fillStyle = '#2C2A29'
       particles.forEach((p) => {
         p.y -= p.speed
         p.x += p.drift
@@ -39,10 +56,19 @@ export default function AmbientBackground() {
         }
         if (p.x < -5) p.x = w + 5
         if (p.x > w + 5) p.x = -5
-        ctx.globalAlpha = p.alpha
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
-        ctx.fill()
+
+        if (p.sparkle) {
+          const twinkle = (Math.sin(t * 2 + p.phase) + 1) / 2
+          ctx.fillStyle = '#c9a876'
+          ctx.globalAlpha = p.alpha * (0.3 + twinkle * 0.7)
+          drawStar(p.x, p.y, p.r * 2.6)
+        } else {
+          ctx.fillStyle = '#2C2A29'
+          ctx.globalAlpha = p.alpha
+          ctx.beginPath()
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2)
+          ctx.fill()
+        }
       })
       ctx.globalAlpha = 1
       raf = requestAnimationFrame(tick)

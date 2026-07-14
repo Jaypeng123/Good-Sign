@@ -11,6 +11,39 @@ const POSITIONS = [
   { top: 86, left: 14 }, { top: 90, left: 62 }, { top: 76, left: 90 },
 ]
 
+function ZodiacPortrait({ z, isSelected, isFocused, dimmed }) {
+  const [errored, setErrored] = useState(false)
+  const size = isSelected ? 108 : isFocused ? 116 : 76
+
+  return (
+    <div
+      className="relative rounded-full overflow-hidden bg-cream transition-[filter,opacity] duration-500"
+      style={{
+        width: size,
+        height: size,
+        filter: dimmed ? 'blur(5px) grayscale(0.4)' : 'none',
+        opacity: dimmed ? 0.35 : 1,
+        border: `1px solid ${isSelected ? '#1D4ED8' : 'rgba(44,42,41,0.35)'}`,
+      }}
+    >
+      {z.image && !errored ? (
+        <img
+          src={z.image}
+          alt={z.label}
+          loading="lazy"
+          onError={() => setErrored(true)}
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{ mixBlendMode: 'multiply' }}
+        />
+      ) : (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <ZodiacEngraving z={z} size={size * 0.8} tone={isSelected ? '#1D4ED8' : '#2C2A29'} />
+        </div>
+      )}
+    </div>
+  )
+}
+
 export default function ChooseSoul({ value, onChange, onNext }) {
   const [hoverIdx, setHoverIdx] = useState(null)
 
@@ -20,7 +53,7 @@ export default function ChooseSoul({ value, onChange, onNext }) {
       <h2 className="font-serif text-3xl sm:text-4xl text-ink text-center mb-2">Who are you meeting?</h2>
       <p className="text-xs text-ink/40 mb-10">選擇對方的星座</p>
 
-      <div className="relative w-full max-w-4xl h-[520px] sm:h-[600px]">
+      <div className="relative w-full max-w-4xl h-[560px] sm:h-[640px]">
         <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
           {hoverIdx !== null &&
             POSITIONS.map((p, i) => {
@@ -44,7 +77,8 @@ export default function ChooseSoul({ value, onChange, onNext }) {
         {ZODIACS.map((z, i) => {
           const pos = POSITIONS[i]
           const isSelected = value === z.id
-          const isHover = hoverIdx === i
+          const isFocused = hoverIdx === i
+          const dimmed = hoverIdx !== null && !isFocused
           return (
             <motion.button
               key={z.id}
@@ -56,16 +90,16 @@ export default function ChooseSoul({ value, onChange, onNext }) {
               className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
               animate={{ y: [0, -6, 0] }}
               transition={{ duration: 4 + (i % 4), repeat: Infinity, ease: 'easeInOut' }}
-              whileHover={{ scale: 1.25, zIndex: 20 }}
+              whileHover={{ scale: 1.12, zIndex: 20 }}
             >
-              <ZodiacEngraving z={z} size={isSelected ? 84 : 64} tone={isSelected ? '#1D4ED8' : '#2C2A29'} />
+              <ZodiacPortrait z={z} isSelected={isSelected} isFocused={isFocused} dimmed={dimmed} />
               <AnimatePresence>
-                {(isHover || isSelected) && (
+                {(isFocused || isSelected) && (
                   <motion.span
                     initial={{ opacity: 0, y: -4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0 }}
-                    className="mt-1 text-[11px] font-serif tracking-wide text-ink whitespace-nowrap"
+                    className="mt-2 text-[11px] font-serif tracking-wide text-ink whitespace-nowrap"
                   >
                     {z.label}
                   </motion.span>

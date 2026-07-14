@@ -14,9 +14,25 @@ function ShareCard({ innerRef, report }) {
   )
 }
 
+function buildCaption(report) {
+  return `我剛用 GOOD SIGN 解讀了跟 ${report.targetName} 見面的星象契合度，居然有 ${report.compatibility}%！\n${report.firstImpression.slice(0, 40)}…\n#GOODSIGN #星座配對 #人類連結數位觀測所`
+}
+
 export default function Share({ report, onRestart }) {
   const cardRef = useRef(null)
   const [copied, setCopied] = useState(false)
+  const [captionCopied, setCaptionCopied] = useState(false)
+  const caption = buildCaption(report)
+
+  async function handleCopyCaption() {
+    try {
+      await navigator.clipboard.writeText(caption)
+      setCaptionCopied(true)
+      window.setTimeout(() => setCaptionCopied(false), 2000)
+    } catch {
+      // clipboard unavailable — nothing more we can do silently
+    }
+  }
 
   async function handleShareLink() {
     const shareText = `我剛用 GOOD SIGN 解讀了 ${report.targetName}，契合度 ${report.compatibility}%！`
@@ -68,7 +84,7 @@ export default function Share({ report, onRestart }) {
         <ShareCard innerRef={cardRef} report={report} />
       </motion.div>
 
-      <div className="flex flex-wrap justify-center gap-3">
+      <div className="flex flex-wrap justify-center gap-3 mb-8">
         <button
           type="button"
           onClick={handleShareLink}
@@ -82,6 +98,18 @@ export default function Share({ report, onRestart }) {
           className="px-6 py-3 rounded-full border border-ink/30 text-ink text-sm font-mono tracking-wide hover:border-ink transition-colors"
         >
           下載分享圖（IG / FB 用）
+        </button>
+      </div>
+
+      <div className="w-full max-w-sm bg-white/30 backdrop-blur-md border border-ink/15 rounded-2xl p-5 text-left">
+        <p className="text-[10px] uppercase tracking-[0.25em] text-ink/40 font-mono mb-2">IG / Threads 文案草稿</p>
+        <p className="text-sm text-ink/70 whitespace-pre-line leading-relaxed mb-3">{caption}</p>
+        <button
+          type="button"
+          onClick={handleCopyCaption}
+          className="px-4 py-2 rounded-full border border-ink/20 text-xs font-mono tracking-wide hover:border-ink transition-colors"
+        >
+          {captionCopied ? '已複製文案 ✓' : '複製文案'}
         </button>
       </div>
 

@@ -29,3 +29,12 @@ body {
 .animate-scanline {
   animation: scanline 1.6s ease-in-out infinite alternate;
 }
+
+@keyframes meander-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-25%);
+  }
+}

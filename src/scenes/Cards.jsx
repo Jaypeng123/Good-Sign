@@ -4,12 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 function CardBack() {
   return (
     <div
-      className="absolute inset-0 rounded-2xl border-2 border-[#1D4ED8]/50 bg-ink flex flex-col items-center justify-center gap-4"
+      className="absolute inset-0 rounded-3xl border-2 border-[#1D4ED8]/50 bg-ink flex flex-col items-center justify-center gap-4"
       style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}
     >
-      <div className="absolute inset-2 rounded-xl border border-[#1D4ED8]/30 pointer-events-none" />
-      <span className="font-['Cinzel'] text-cream/80 text-lg tracking-[0.3em]">GOOD SIGN</span>
-      <span className="text-[#1D4ED8] text-3xl">✦</span>
+      <div className="absolute inset-3 rounded-2xl border border-[#1D4ED8]/30 pointer-events-none" />
+      <div className="absolute inset-6 rounded-xl border border-[#1D4ED8]/15 pointer-events-none" />
+      <span className="font-['Cinzel'] text-cream/80 text-xl tracking-[0.3em]">GOOD SIGN</span>
+      <span className="text-[#1D4ED8] text-4xl">✦</span>
       <span className="text-[10px] uppercase tracking-widest text-cream/40 font-mono">Tap to draw</span>
     </div>
   )
@@ -18,16 +19,23 @@ function CardBack() {
 function CardFront({ card, index, total }) {
   return (
     <div
-      className="absolute inset-0 rounded-2xl border-2 border-[#1D4ED8]/40 bg-cream p-6 sm:p-8 flex flex-col shadow-[0_20px_40px_-12px_rgba(29,78,216,0.25)] overflow-hidden"
+      className="absolute inset-0 rounded-3xl border-2 border-[#1D4ED8]/40 bg-cream p-7 sm:p-10 flex flex-col shadow-[0_25px_60px_-15px_rgba(29,78,216,0.3)] overflow-hidden"
       style={{ backfaceVisibility: 'hidden' }}
     >
-      <div className="absolute inset-2 rounded-xl border border-[#1D4ED8]/20 pointer-events-none" />
-      <div className="flex items-center justify-between mb-4">
+      <div className="absolute inset-3 rounded-2xl border border-[#1D4ED8]/20 pointer-events-none" />
+      <div className="absolute inset-6 rounded-xl border border-[#1D4ED8]/10 pointer-events-none" />
+      <div className="flex items-center justify-between mb-5">
         <span className="font-mono text-xs text-ink/40 tracking-widest">No. {index + 1} / {total}</span>
-        <span className="font-serif text-2xl text-[#1D4ED8]">{card.score}%</span>
+        <span className="font-serif text-3xl text-[#1D4ED8]">{card.score}%</span>
       </div>
-      <h3 className="font-serif text-xl sm:text-2xl text-ink leading-snug mb-4">{card.title}</h3>
-      <p className="text-sm text-ink/60 leading-relaxed flex-1 overflow-y-auto">{card.reason}</p>
+      <h3 className="font-serif text-2xl sm:text-3xl text-ink leading-snug mb-5">{card.title}</h3>
+      <p className="text-sm sm:text-base text-ink/60 leading-relaxed flex-1 overflow-y-auto">{card.reason}</p>
+      {card.avoidSaying && (
+        <div className="mt-5 pt-4 border-t border-ink/10">
+          <p className="text-[10px] uppercase tracking-[0.25em] text-[#1D4ED8]/50 font-mono mb-1.5">Avoid Saying</p>
+          <p className="text-xs sm:text-sm text-ink/50 leading-relaxed">{card.avoidSaying}</p>
+        </div>
+      )}
       <div className="mt-4 text-center text-[#1D4ED8]/40 text-lg">✦</div>
     </div>
   )
@@ -55,7 +63,7 @@ export default function Cards({ cards, onNext }) {
       <p className="text-[10px] uppercase tracking-[0.35em] text-ink/40 font-mono mb-2">Tarot Conversation Cards</p>
       <h2 className="font-serif text-2xl sm:text-3xl text-ink text-center mb-10">{cards.length} 張破冰話題牌組</h2>
 
-      <div className="relative w-full max-w-sm h-[380px] sm:h-[420px]" style={{ perspective: 1200 }}>
+      <div className="relative w-full max-w-md h-[440px] sm:h-[520px]" style={{ perspective: 1200 }}>
         <AnimatePresence initial={false} mode="popLayout">
           <motion.div
             key={card.id}
