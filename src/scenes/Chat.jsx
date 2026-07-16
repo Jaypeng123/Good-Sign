@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ZODIACS } from '../data'
 import { chatWithPersonaAI, hasGeminiKey } from '../lib/gemini'
+import ZodiacStatue from '../components/ZodiacStatue'
 
 const FALLBACK_REPLIES = {
   fire: ['哈哈這樣講也太直接了吧，我喜歡！', '欸等等我剛剛在想別的事，你繼續說！', '好啊好啊，那我們就這樣約定了。'],
@@ -65,6 +66,11 @@ export default function Chat({ zodiac, onNext }) {
   return (
     <div className="relative min-h-screen flex flex-col items-center px-6 pt-24 pb-16">
       <p className="text-[10px] uppercase tracking-[0.35em] text-ink/40 font-mono mb-2">AI Practice Chat Room</p>
+      {zInfo && (
+        <div className="mb-3">
+          <ZodiacStatue z={zInfo} size={84} />
+        </div>
+      )}
       <h2 className="font-serif text-2xl sm:text-3xl text-ink text-center mb-1">和 {zInfo?.label ?? '對方'} 練習聊天</h2>
       <p className="text-[10px] text-ink/30 font-mono mb-8">
         {hasGeminiKey() ? '由 Gemini 驅動的人格模擬' : '本地人格模擬（未設定 Gemini API Key）'}

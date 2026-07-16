@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ZODIACS } from '../data'
-import ZodiacEngraving from '../components/ZodiacEngraving'
+import ZodiacStatue from '../components/ZodiacStatue'
 
 // Hand-placed asymmetric coordinates (percent) — deliberately not a grid, not a circle.
 const POSITIONS = [
@@ -11,35 +11,18 @@ const POSITIONS = [
   { top: 86, left: 14 }, { top: 90, left: 62 }, { top: 76, left: 90 },
 ]
 
-function ZodiacPortrait({ z, isSelected, isFocused, dimmed }) {
-  const [errored, setErrored] = useState(false)
-  const size = isSelected ? 108 : isFocused ? 116 : 76
+function ZodiacFigure({ z, isSelected, isFocused, dimmed }) {
+  const size = isSelected ? 96 : isFocused ? 104 : 68
 
   return (
     <div
-      className="relative rounded-full overflow-hidden bg-cream transition-[filter,opacity] duration-500"
+      className="transition-[filter,opacity] duration-500"
       style={{
-        width: size,
-        height: size,
-        filter: dimmed ? 'blur(5px) grayscale(0.4)' : 'none',
+        filter: dimmed ? 'blur(5px) grayscale(0.4)' : isSelected ? 'drop-shadow(0 0 8px rgba(29,78,216,0.35))' : 'none',
         opacity: dimmed ? 0.35 : 1,
-        border: `1px solid ${isSelected ? '#1D4ED8' : 'rgba(44,42,41,0.35)'}`,
       }}
     >
-      {z.image && !errored ? (
-        <img
-          src={z.image}
-          alt={z.label}
-          loading="lazy"
-          onError={() => setErrored(true)}
-          className="absolute inset-0 w-full h-full object-cover"
-          style={{ mixBlendMode: 'multiply' }}
-        />
-      ) : (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <ZodiacEngraving z={z} size={size * 0.8} tone={isSelected ? '#1D4ED8' : '#2C2A29'} />
-        </div>
-      )}
+      <ZodiacStatue z={z} size={size} interactive={isFocused || isSelected} />
     </div>
   )
 }
@@ -92,7 +75,7 @@ export default function ChooseSoul({ value, onChange, onNext }) {
               transition={{ duration: 4 + (i % 4), repeat: Infinity, ease: 'easeInOut' }}
               whileHover={{ scale: 1.12, zIndex: 20 }}
             >
-              <ZodiacPortrait z={z} isSelected={isSelected} isFocused={isFocused} dimmed={dimmed} />
+              <ZodiacFigure z={z} isSelected={isSelected} isFocused={isFocused} dimmed={dimmed} />
               <AnimatePresence>
                 {(isFocused || isSelected) && (
                   <motion.span

@@ -1,8 +1,11 @@
 import { useEffect, useRef } from 'react'
 import { ensureGsap } from '../lib/gsapSetup'
+import { ZODIACS } from '../data'
+import ZodiacStatue from '../components/ZodiacStatue'
 
-export default function Report({ report, onNext }) {
+export default function Report({ report, zodiac, onNext }) {
   const heroRef = useRef(null)
+  const zInfo = ZODIACS.find((z) => z.id === zodiac)
   const chapterRefs = useRef([])
 
   useEffect(() => {
@@ -33,6 +36,11 @@ export default function Report({ report, onNext }) {
   return (
     <div className="relative">
       <section ref={heroRef} className="min-h-screen flex flex-col items-center justify-center text-center px-6">
+        {zInfo && (
+          <div className="mb-6">
+            <ZodiacStatue z={zInfo} size={132} />
+          </div>
+        )}
         <p className="text-[10px] uppercase tracking-[0.35em] text-ink/40 font-mono mb-6">
           Oracle Report — {report.targetName}
         </p>

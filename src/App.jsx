@@ -130,7 +130,9 @@ export default function App() {
 
           {scene === 'ritual' && <Ritual onDone={handleRitualDone} />}
 
-          {scene === 'report' && report && <Report report={report} onNext={() => setScene('cards')} />}
+          {scene === 'report' && report && (
+            <Report report={report} zodiac={profile.target.zodiac} onNext={() => setScene('cards')} />
+          )}
 
           {scene === 'cards' && <Cards cards={topicDeck} onNext={() => setScene('chat')} />}
 
