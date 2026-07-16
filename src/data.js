@@ -198,8 +198,19 @@ function ageCompat(a, b) {
 }
 
 const WEIGHTS = { element: 0.28, mbti: 0.22, attachment: 0.2, chatStyle: 0.15, interests: 0.1, age: 0.05 }
+// When a chat-screenshot signal is available it earns its own slice of the
+// weight, borrowed proportionally from every other dimension.
+const WEIGHTS_WITH_SCREENSHOT = { element: 0.24, mbti: 0.19, attachment: 0.17, chatStyle: 0.13, interests: 0.08, age: 0.04, screenshot: 0.15 }
 
-export function calculateCompatibility({ you = {}, target = {} }) {
+// Normalizes either the real Gemini-vision reading ({responsiveness, warmth,
+// engagement}) or the local deterministic fallback into a single 0..1 score.
+function screenshotCompat(signal) {
+  if (!signal) return null
+  const { responsiveness = 50, warmth = 50, engagement = 50 } = signal
+  return Math.max(0, Math.min(1, (responsiveness + warmth + engagement) / 300))
+}
+
+export function calculateCompatibility({ you = {}, target = {}, screenshotSignal = null }) {
   const youEl = ZODIACS.find((z) => z.id === you.zodiac)?.element
   const targetEl = ZODIACS.find((z) => z.id === target.zodiac)?.element
   const elementScore = youEl && targetEl ? ELEMENT_COMPAT[youEl][targetEl] : 0.65
@@ -210,14 +221,17 @@ export function calculateCompatibility({ you = {}, target = {} }) {
   const seed = seedFromString(`${you.zodiac}-${target.zodiac}-${you.interests}-${target.interests}`)
   const interestsScore = interestsCompat(you.interests, target.interests, seed)
   const age = ageCompat(you.age, target.age)
+  const screenshotScore = screenshotCompat(screenshotSignal)
 
-  const weighted =
-    elementScore * WEIGHTS.element +
-    mbtiScore * WEIGHTS.mbti +
-    attachmentScore * WEIGHTS.attachment +
-    chatScore * WEIGHTS.chatStyle +
-    interestsScore * WEIGHTS.interests +
-    age * WEIGHTS.age
+  const w = screenshotScore !== null ? WEIGHTS_WITH_SCREENSHOT : WEIGHTS
+  let weighted =
+    elementScore * w.element +
+    mbtiScore * w.mbti +
+    attachmentScore * w.attachment +
+    chatScore * w.chatStyle +
+    interestsScore * w.interests +
+    age * w.age
+  if (screenshotScore !== null) weighted += screenshotScore * w.screenshot
 
   const score = Math.round(Math.max(50, Math.min(98, 50 + weighted * 48)))
 
@@ -227,7 +241,9 @@ export function calculateCompatibility({ you = {}, target = {} }) {
     { key: 'attachment', label: '依戀契合', value: attachmentScore },
     { key: 'chatStyle', label: '溝通節奏', value: chatScore },
     { key: 'interests', label: '興趣重疊', value: interestsScore },
-  ].sort((a, b) => b.value - a.value)
+  ]
+  if (screenshotScore !== null) breakdown.push({ key: 'screenshot', label: '截圖氛圍', value: screenshotScore })
+  breakdown.sort((a, b) => b.value - a.value)
 
   return { score, breakdown }
 }
@@ -235,10 +251,10 @@ export function calculateCompatibility({ you = {}, target = {} }) {
 // --- Oracle Report -----------------------------------------------------------
 // Reshapes the You/Target profile pair into the four-chapter ritual structure
 // (First Impression / Hidden Frequency / Things To Avoid / Perfect Conversation Topics).
-export function generateOracleReport({ you = {}, target = {}, meetingType, environment }) {
+export function generateOracleReport({ you = {}, target = {}, meetingType, environment, screenshotSignal = null }) {
   const zInfo = ZODIACS.find((z) => z.id === target.zodiac)
   const targetPersona = zInfo ? `${zInfo.label}（${zInfo.god}）` : (target.mbti || '神祕觀測對象')
-  const { score: compatibility, breakdown } = calculateCompatibility({ you, target })
+  const { score: compatibility, breakdown } = calculateCompatibility({ you, target, screenshotSignal })
   const meetingLabel = MEETING_TYPES.find((m) => m.id === meetingType)?.label ?? '這場見面'
   const envLabel = ENVIRONMENTS_V2.find((e) => e.id === environment)?.label ?? '這個場合'
 
@@ -252,6 +268,9 @@ export function generateOracleReport({ you = {}, target = {}, meetingType, envir
     firstImpression += `雖然目前缺乏人格代碼的輔助加權，但其純粹的星象底蘊已經展現出極高的特質清晰度。`
   }
   firstImpression += ` 在「${meetingLabel}・${envLabel}」的座標下，這股氣場會比平常更容易顯現真實的一面。`
+  if (screenshotSignal?.summary) {
+    firstImpression += ` 從你上傳的對話截圖來看，${screenshotSignal.summary}`
+  }
 
   let hiddenFrequency = '這個人的情緒訊號不會直接寫在臉上，需要一點耐心才能讀懂真正的頻率。'
   if (zInfo?.traits) {
@@ -331,7 +350,7 @@ function pickAvoidSaying(topic, meetingType, seed) {
   return pool[Math.floor(rng() * pool.length)]
 }
 
-export function generateTopicDeck({ you = {}, target = {}, meetingType }) {
+export function generateTopicDeck({ you = {}, target = {}, meetingType, screenshotSignal = null }) {
   const zInfo = ZODIACS.find((z) => z.id === target.zodiac)
   const element = zInfo?.element
 
@@ -342,6 +361,7 @@ export function generateTopicDeck({ you = {}, target = {}, meetingType }) {
     if (meetingType && topic.tags.includes(meetingType)) score += 16
     if (element && topic.elements.includes(element)) score += 12
     if (target.mbti && target.mbti[0] === 'E') score += 3
+    if (screenshotSignal?.engagement) score += Math.round((screenshotSignal.engagement - 50) / 10)
     score += Math.floor(rng() * 14)
     score = Math.max(42, Math.min(98, score))
     return {
@@ -364,4 +384,24 @@ export function analyzeScreenshot(file) {
   const balanceScore = ((hash >> 2) % 40) + 50
   const auraLevel = ((hash >> 4) % 35) + 60
   return { freezeRate, balanceScore, auraLevel }
+}
+
+// Local, deterministic stand-in for the Gemini vision reading — used whenever
+// no API key is set or the vision request fails. Same {responsiveness,
+// warmth, engagement, summary} shape as the AI path so callers don't care
+// which one produced it.
+export function localScreenshotSignal(file) {
+  const { freezeRate, balanceScore, auraLevel } = analyzeScreenshot(file)
+  const responsiveness = Math.max(0, Math.min(100, 100 - freezeRate))
+  const warmth = balanceScore
+  const engagement = auraLevel
+  let summary = '這段對話的節奏偏向平穩，雙方都還在互相試探彼此的步調。'
+  if (responsiveness > 70 && warmth > 65) {
+    summary = '雙方回覆都很積極，對話氣氛熱絡，是很好的起手式。'
+  } else if (responsiveness < 45) {
+    summary = '回覆節奏偏慢，可能需要更有記憶點的開場話題來拉高互動意願。'
+  } else if (warmth > 70) {
+    summary = '語氣偏溫暖親近，感覺雙方已經有一定的熟悉感。'
+  }
+  return { responsiveness, warmth, engagement, summary }
 }

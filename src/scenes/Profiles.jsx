@@ -130,11 +130,53 @@ function PersonColumn({ title, subtitle, person, setPerson, showZodiac, showOccu
   )
 }
 
+function ScreenshotUpload({ file, onChange }) {
+  const [previewUrl, setPreviewUrl] = useState(null)
+
+  function handleFile(e) {
+    const f = e.target.files?.[0] ?? null
+    onChange(f)
+    setPreviewUrl(f ? URL.createObjectURL(f) : null)
+  }
+
+  function clear() {
+    onChange(null)
+    setPreviewUrl(null)
+  }
+
+  return (
+    <Field label="對話截圖 Chat Screenshot（選填）">
+      <p className="text-xs text-ink/50 mb-3">上傳與對方的聊天截圖，AI 會分析互動氣氛並納入契合度計算。</p>
+      {file ? (
+        <div className="flex items-center gap-3">
+          {previewUrl && (
+            <img src={previewUrl} alt="截圖預覽" className="w-16 h-16 object-cover rounded-xl border border-ink/15" />
+          )}
+          <div className="flex-1 text-xs text-ink/60 truncate">{file.name}</div>
+          <button
+            type="button"
+            onClick={clear}
+            className="px-3 py-1.5 rounded-full border border-ink/20 text-xs font-mono hover:border-ink transition-colors"
+          >
+            移除
+          </button>
+        </div>
+      ) : (
+        <label className="flex items-center justify-center px-4 py-3 rounded-xl border border-dashed border-ink/25 text-xs font-mono text-ink/50 cursor-pointer hover:border-ink/50 transition-colors">
+          點擊上傳截圖
+          <input type="file" accept="image/*" onChange={handleFile} className="hidden" />
+        </label>
+      )}
+    </Field>
+  )
+}
+
 export default function Profiles({ targetZodiac, onComplete }) {
   const [you, setYou] = useState({})
   const [target, setTarget] = useState({ zodiac: targetZodiac })
   const [meetingType, setMeetingType] = useState('')
   const [environment, setEnvironment] = useState('')
+  const [screenshotFile, setScreenshotFile] = useState(null)
 
   const blocked = !you.zodiac || !meetingType || !environment
 
@@ -201,12 +243,13 @@ export default function Profiles({ targetZodiac, onComplete }) {
             ))}
           </div>
         </Field>
+        <ScreenshotUpload file={screenshotFile} onChange={setScreenshotFile} />
       </div>
 
       <motion.button
         type="button"
         disabled={blocked}
-        onClick={() => onComplete({ you, target, meetingType, environment })}
+        onClick={() => onComplete({ you, target, meetingType, environment, screenshotFile })}
         whileHover={!blocked ? { scale: 1.05 } : {}}
         className={`mt-12 px-10 py-4 rounded-full border text-xs uppercase tracking-[0.3em] font-mono transition-colors duration-500 ${
           blocked ? 'border-ink/10 text-ink/20 cursor-not-allowed' : 'border-ink/30 hover:bg-ink hover:text-cream hover:border-ink'

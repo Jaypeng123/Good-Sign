@@ -2,8 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Lenis from 'lenis'
 import { ensureGsap } from './lib/gsapSetup'
-import { generateOracleReport, generateTopicDeck } from './data'
-import { generateOracleReportAI } from './lib/gemini'
+import { generateOracleReport, generateTopicDeck, localScreenshotSignal } from './data'
+import { generateOracleReportAI, analyzeScreenshotAI } from './lib/gemini'
 import AmbientBackground from './components/AmbientBackground'
 import ZodiacOrbit from './components/ZodiacOrbit'
 import Amphora from './components/Amphora'
@@ -52,7 +52,7 @@ export default function App() {
     setProfile((p) => ({ ...p, target: { ...p.target, zodiac } }))
   }
 
-  async function handleProfilesComplete(vals) {
+  async function handleProfilesComplete({ screenshotFile, ...vals }) {
     setProfile(vals)
     setScene('ritual')
 
@@ -60,9 +60,15 @@ export default function App() {
     // Gemini first (if a key is configured), silently falling back to the
     // local weighted algorithm on missing key, network failure, or bad JSON.
     pendingResult.current = (async () => {
-      const aiReport = await generateOracleReportAI(vals)
-      const localReport = generateOracleReport(vals)
-      const deck = generateTopicDeck(vals)
+      let screenshotSignal = null
+      if (screenshotFile) {
+        screenshotSignal = (await analyzeScreenshotAI(screenshotFile)) ?? localScreenshotSignal(screenshotFile)
+      }
+      const payload = { ...vals, screenshotSignal }
+
+      const aiReport = await generateOracleReportAI(payload)
+      const localReport = generateOracleReport(payload)
+      const deck = generateTopicDeck(payload)
 
       if (aiReport) {
         return {
@@ -136,7 +142,7 @@ export default function App() {
 
           {scene === 'cards' && <Cards cards={topicDeck} onNext={() => setScene('chat')} />}
 
-          {scene === 'chat' && <Chat zodiac={profile.target.zodiac} onNext={() => setScene('share')} />}
+          {scene === 'chat' && <Chat target={profile.target} onNext={() => setScene('share')} />}
 
           {scene === 'share' && report && <Share report={report} onRestart={handleRestart} />}
         </motion.div>

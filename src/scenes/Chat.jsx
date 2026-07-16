@@ -26,8 +26,8 @@ function TypingDots() {
   )
 }
 
-export default function Chat({ zodiac, onNext }) {
-  const zInfo = ZODIACS.find((z) => z.id === zodiac)
+export default function Chat({ target, onNext }) {
+  const zInfo = ZODIACS.find((z) => z.id === target?.zodiac)
   const [messages, setMessages] = useState([
     { role: 'model', text: `嗨，我是${zInfo?.label ?? '對方'}人格模擬，來練習聊聊天吧？`, read: true },
   ])
@@ -53,7 +53,7 @@ export default function Chat({ zodiac, onNext }) {
     setTyping(true)
     const history = nextMessages.map((m) => ({ role: m.role, text: m.text }))
     let reply = null
-    if (zInfo) reply = await chatWithPersonaAI({ zodiac: zInfo, history, userMessage: text })
+    if (zInfo) reply = await chatWithPersonaAI({ target, history, userMessage: text })
     if (!reply) {
       const pool = FALLBACK_REPLIES[zInfo?.element] ?? FALLBACK_REPLIES.air
       reply = pool[Math.floor(Math.random() * pool.length)]
