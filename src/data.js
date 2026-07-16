@@ -39,16 +39,7 @@ export const ENERGIES = [
   { id: 'low', label: '低能量 (寧靜沉穩)', hint: '慢熱傾聽' },
 ];
 
-// 預設在地備用話題庫（當網路斷線或 API 限制時的安全 Fallback 機制）
-export const FALLBACK_TAROT_DECK = [
-  { title: '聊聊彼此生命中最著迷的一種感官特徵或物件細節', rate: 95, reason: '繞過表面的社交客套，直接以美學特徵開啟高度共情。', avoidSaying: '過度打聽對方的具體薪水與資產。' },
-  { title: '分享一個只有極少數人知道的私房生活儀式與怪癖', rate: 92, reason: '主動暴露反差萌的怪癖，能在心理學上建立強大的安全感。', avoidSaying: '對對方的習慣露出嫌惡的表情。' },
-  { title: '假如有一整天不被任何人打擾，你最想在哪個角落度過', rate: 89, reason: '無壓力的精神逃離，能輕鬆探知對方的審美與防禦機制。', avoidSaying: '強行推銷自己的旅行經歷。' },
-  { title: '最近在你的興趣圈子裡，有沒有哪一個作品讓你廢寢忘食', rate: 94, reason: '切入硬核興趣領域，最能點燃靈魂深處的分享與敘事欲。', avoidSaying: '對對方的愛好潑冷水或糾正細節。' },
-  { title: '聊聊你在過往生涯中，印象最深刻的一段低谷重組經驗', rate: 90, reason: '比起完美的成功，有養分的低谷更有利於建立深層精神連結。', avoidSaying: '將話題變成無止盡的負能量抱怨。' }
-];
-
-// 多維度在地基礎配對演算法（用來給 AI 生成報告前，做基準加權參考）
+// 多維度在地基礎配對演算法
 export function calculateFallbackScore(you, target) {
   let score = 75;
   const elements = {
@@ -71,8 +62,8 @@ export function calculateFallbackScore(you, target) {
   }
 
   if (you.mbti && target.mbti) {
-    if (you.mbti[1] === target.mbti[1]) score += 8; // N/S 契合
-    if (you.mbti[0] !== target.mbti[0]) score += 4; // E/I 互補
+    if (you.mbti[1] === target.mbti[1]) score += 8;
+    if (you.mbti[0] !== target.mbti[0]) score += 4;
   }
 
   if (you.age && target.age) {
@@ -82,4 +73,61 @@ export function calculateFallbackScore(you, target) {
   }
 
   return Math.max(50, Math.min(98, score));
+}
+
+// 🌟 關鍵修正：確實定義並匯出 generateComprehensiveAnalysis，確保無 Key 時也能完美渲染！
+export function generateComprehensiveAnalysis({ you, target }) {
+  const calculatedScore = calculateFallbackScore(you, target);
+  const zInfo = ZODIACS.find(z => z.id === target.zodiac);
+  const targetName = zInfo ? zInfo.label : (target.mbti || '觀測對象');
+
+  let macroAssessment = `根據星宿與當代性格軌道的密契觀測，雙方的氣場呈現出一種極具美感的動態共鳴。`;
+  if (zInfo) {
+    macroAssessment += `當前對象深深共鳴於「${zInfo.god}」的守護能量。這意味著在日常社交的防禦機制背後，他們${zInfo.desc}`;
+  }
+  if (target.mbti) {
+    macroAssessment += `結合其 ${target.mbti} 的人格特質與今日較低調的能量級別，這次見面更適合深入的精神共振，而非流於表面的世俗客套。`;
+  }
+
+  const cards = [
+    {
+      title: `探討彼此在 ${you.profession || '日常領域'} 與 ${target.profession || '專業學門'} 之間的思維反差`,
+      rate: calculatedScore + 3,
+      reason: `利用雙方的職業背景差異，以輕鬆好奇的角度切入，能瞬間建立有深度的智識對頻。`,
+      avoidSaying: `「那你們這行是不是都很閒/很賺？」等刻板偏見。`
+    },
+    {
+      title: `分享一個最能代表你對「${target.interest || '特定領域'}」熱忱的私房瞬間`,
+      rate: calculatedScore,
+      reason: `當人談論自己真正熱愛的事物時，眼神中的光芒與能量波長最具感染力。`,
+      avoidSaying: `漫不經心地滑手機或給予敷衍的回應。`
+    },
+    {
+      title: `聊聊在 ${you.mbti || '當前'} 與 ${target.mbti || '對象'} 的世界裡，最容易感到能量耗盡的社交情境`,
+      rate: calculatedScore - 2,
+      reason: `共同吐槽社交中的「低效消耗」，能在心理學上迅速拉近距離，建立共同防禦陣線。`,
+      avoidSaying: `強行給對方灌輸過度樂觀的社交正能量。`
+    },
+    {
+      title: `假如可以自由支配時間，最想在當前環境進行什麼樣的精神逃離`,
+      rate: calculatedScore + 1,
+      reason: `將話題錨定在當前見面的物理環境延伸，能創造沉浸式的臨場感與浪漫共鳴。`,
+      avoidSaying: `批判對方的放鬆方式不切實際。`
+    },
+    {
+      title: `探討彼此心目中，覺得「真正被他人理解」的微小瞬間是什麼模樣`,
+      rate: calculatedScore + 5,
+      reason: `直擊靈魂核心的極致溫柔對頻，能讓守護神對你徹底卸下心防。`,
+      avoidSaying: `急於保證自己就是那個完美理解者。`
+    }
+  ];
+
+  return {
+    targetName,
+    survivalRate: calculatedScore,
+    macroAssessment,
+    cards,
+    rescueLine: `「實不相瞞，我出門前還在心裡演練了好幾次冷場該怎麼辦，但現在看到你，我覺得可以先放鬆聊聊今天這杯咖啡的風味。」`,
+    forbidden: `請絕對避免在對話初期過度探聽其隱私底線（例如過往關係細節），那會讓注重邊界的守護神瞬間降下冰封閘門。`
+  };
 }
